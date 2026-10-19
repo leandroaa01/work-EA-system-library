@@ -1,0 +1,282 @@
+sort Bool .
+sort Zero .	subsorts Zero < Nat FindResult .
+sort NzNat .	subsorts NzNat < Nat FindResult .
+sort Nat .	subsorts NzNat Zero < Nat < FindResult .
+sort String .	subsort Char < String .
+sort Char .	subsort Char < String .
+sort FindResult .	subsorts NzNat Zero Nat < FindResult .
+sort IdLivro .
+sort IdUsuario .	subsort IdUsuario < Usuarios .
+sort Status .
+sort Item .	subsorts Item < ItemOuErro Acervo .
+sort Acervo .	subsort Item < Acervo .
+sort ItemOuErro .	subsort Item < ItemOuErro .
+sort Usuarios .	subsort IdUsuario < Usuarios .
+sort Biblioteca .
+sort Diagnostico .
+op if_then_else_fi : Bool Universal Universal -> Universal [poly (2 3 0) prec 0
+    gather (& & &) special (
+    id-hook BranchSymbol
+    term-hook 1 (true)
+    term-hook 2 (false))] .
+op _==_ : Universal Universal -> Bool [poly (1 2) prec 51 gather (E E) special
+    (
+    id-hook EqualitySymbol
+    term-hook equalTerm (true)
+    term-hook notEqualTerm (false))] .
+op _=/=_ : Universal Universal -> Bool [poly (1 2) prec 51 gather (E E) special
+    (
+    id-hook EqualitySymbol
+    term-hook equalTerm (false)
+    term-hook notEqualTerm (true))] .
+op true : -> Bool [ctor special (
+    id-hook SystemTrue)] .
+op false : -> Bool [ctor special (
+    id-hook SystemFalse)] .
+op _and_ : Bool Bool -> Bool [assoc comm prec 55 gather (e E)] .
+op _or_ : Bool Bool -> Bool [assoc comm prec 59 gather (e E)] .
+op _xor_ : Bool Bool -> Bool [assoc comm prec 57 gather (e E)] .
+op not_ : Bool -> Bool [prec 53 gather (E)] .
+op _implies_ : Bool Bool -> Bool [prec 61 gather (e E)] .
+op 0 : -> Zero [ctor] .
+op s_ : Nat -> NzNat [ctor iter prec 15 gather (E) special (
+    id-hook SuccSymbol
+    term-hook zeroTerm (0))] .
+op _+_ : NzNat Nat -> NzNat [assoc comm prec 33 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (+)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _+_ : Nat Nat -> Nat [assoc comm prec 33 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (+)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op sd : Nat Nat -> Nat [comm special (
+    id-hook CUI_NumberOpSymbol (sd)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _*_ : NzNat NzNat -> NzNat [assoc comm prec 31 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (*)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _*_ : Nat Nat -> Nat [assoc comm prec 31 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (*)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _quo_ : Nat NzNat -> Nat [prec 31 gather (E e) special (
+    id-hook NumberOpSymbol (quo)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _rem_ : Nat NzNat -> Nat [prec 31 gather (E e) special (
+    id-hook NumberOpSymbol (rem)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _^_ : Nat Nat -> Nat [prec 29 gather (E e) special (
+    id-hook NumberOpSymbol (^)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _^_ : NzNat Nat -> NzNat [prec 29 gather (E e) special (
+    id-hook NumberOpSymbol (^)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op modExp : [FindResult] [FindResult] [FindResult] -> [FindResult] [special (
+    id-hook NumberOpSymbol (modExp)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op gcd : NzNat Nat -> NzNat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (gcd)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op gcd : Nat Nat -> Nat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (gcd)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op lcm : NzNat NzNat -> NzNat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (lcm)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op lcm : Nat Nat -> Nat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (lcm)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op min : NzNat NzNat -> NzNat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (min)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op min : Nat Nat -> Nat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (min)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op max : NzNat Nat -> NzNat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (max)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op max : Nat Nat -> Nat [assoc comm special (
+    id-hook ACU_NumberOpSymbol (max)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _xor_ : Nat Nat -> Nat [assoc comm prec 55 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (xor)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _&_ : Nat Nat -> Nat [assoc comm prec 53 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (&)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _|_ : NzNat Nat -> NzNat [assoc comm prec 57 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (|)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _|_ : Nat Nat -> Nat [assoc comm prec 57 gather (e E) special (
+    id-hook ACU_NumberOpSymbol (|)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _>>_ : Nat Nat -> Nat [prec 35 gather (E e) special (
+    id-hook NumberOpSymbol (>>)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _<<_ : Nat Nat -> Nat [prec 35 gather (E e) special (
+    id-hook NumberOpSymbol (<<)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _<_ : Nat Nat -> Bool [prec 37 gather (E E) special (
+    id-hook NumberOpSymbol (<)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _<=_ : Nat Nat -> Bool [prec 37 gather (E E) special (
+    id-hook NumberOpSymbol (<=)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _>_ : Nat Nat -> Bool [prec 37 gather (E E) special (
+    id-hook NumberOpSymbol (>)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _>=_ : Nat Nat -> Bool [prec 37 gather (E E) special (
+    id-hook NumberOpSymbol (>=)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _divides_ : NzNat Nat -> Bool [prec 51 gather (E E) special (
+    id-hook NumberOpSymbol (divides)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op <Strings> : -> Char [special (
+    id-hook StringSymbol)] .
+op <Strings> : -> String [special (
+    id-hook StringSymbol)] .
+op notFound : -> FindResult [ctor] .
+op ascii : Char -> Nat [special (
+    id-hook StringOpSymbol (ascii)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op char : [FindResult] -> [String] [special (
+    id-hook StringOpSymbol (char)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op _+_ : String String -> String [prec 33 gather (E e) special (
+    id-hook StringOpSymbol (+)
+    op-hook stringSymbol (<Strings> : ~> Char))] .
+op length : String -> Nat [special (
+    id-hook StringOpSymbol (length)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op substr : String Nat Nat -> String [special (
+    id-hook StringOpSymbol (substr)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat))] .
+op find : String String Nat -> FindResult [special (
+    id-hook StringOpSymbol (find)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook notFoundTerm (notFound))] .
+op rfind : String String Nat -> FindResult [special (
+    id-hook StringOpSymbol (rfind)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    op-hook succSymbol (s_ : Nat ~> NzNat)
+    term-hook notFoundTerm (notFound))] .
+op _<_ : String String -> Bool [prec 37 gather (E E) special (
+    id-hook StringOpSymbol (<)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _<=_ : String String -> Bool [prec 37 gather (E E) special (
+    id-hook StringOpSymbol (<=)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _>_ : String String -> Bool [prec 37 gather (E E) special (
+    id-hook StringOpSymbol (>)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op _>=_ : String String -> Bool [prec 37 gather (E E) special (
+    id-hook StringOpSymbol (>=)
+    op-hook stringSymbol (<Strings> : ~> Char)
+    term-hook trueTerm (true)
+    term-hook falseTerm (false))] .
+op upperCase : String -> String [special (
+    id-hook StringOpSymbol (upperCase)
+    op-hook stringSymbol (<Strings> : ~> Char))] .
+op lowerCase : String -> String [special (
+    id-hook StringOpSymbol (lowerCase)
+    op-hook stringSymbol (<Strings> : ~> Char))] .
+op livro : Nat -> IdLivro [ctor] .
+op usuario : Nat -> IdUsuario [ctor] .
+op disponivel : -> Status [ctor] .
+op emprestado : IdUsuario -> Status [ctor] .
+op item : IdLivro String Status -> Item [ctor] .
+op getId : Item -> IdLivro .
+op getTitulo : Item -> String .
+op getStatus : Item -> Status .
+op comStatus : Item Status -> Item .
+op itemDisponivel? : Item -> Bool .
+op itemDe? : Item IdUsuario -> Bool .
+op nilA : -> Acervo [ctor] .
+op _;_ : Acervo Acervo -> Acervo [ctor assoc id: nilA prec 41 gather (e E)] .
+op livroInexistente : -> ItemOuErro [ctor] .
+op totalA : Acervo -> Nat .
+op qtdDisponiveisA : Acervo -> Nat .
+op qtdEmprestadosA : Acervo -> Nat .
+op existeA? : Acervo IdLivro -> Bool .
+op disponivelA? : Acervo IdLivro -> Bool .
+op possuiA? : Acervo IdUsuario IdLivro -> Bool .
+op buscarA : Acervo IdLivro -> ItemOuErro .
+op livrosDeA : Acervo IdUsuario -> Acervo .
+op idsUnicosA? : Acervo -> Bool .
+op removerA : Acervo IdLivro -> Acervo .
+op definirStatus : Acervo IdLivro Status -> Acervo .
+op nilU : -> Usuarios [ctor] .
+op _&_ : Usuarios Usuarios -> Usuarios [ctor assoc id: nilU prec 41 gather (e
+    E)] .
+op totalU : Usuarios -> Nat .
+op existeU? : Usuarios IdUsuario -> Bool .
+op removerU : Usuarios IdUsuario -> Usuarios .
+op unicosU? : Usuarios -> Bool .
+op biblioteca : Acervo Usuarios -> Biblioteca [ctor] .
+op bibliotecaVazia : -> Biblioteca .
+op limiteEmprestimos : -> Nat .
+op totalLivros : Biblioteca -> Nat .
+op qtdEmprestados : Biblioteca -> Nat .
+op qtdDisponiveis : Biblioteca -> Nat .
+op totalUsuarios : Biblioteca -> Nat .
+op pertence? : Biblioteca IdLivro -> Bool .
+op disponivel? : Biblioteca IdLivro -> Bool .
+op possui? : Biblioteca IdUsuario IdLivro -> Bool .
+op existeUsuario? : Biblioteca IdUsuario -> Bool .
+op buscar : Biblioteca IdLivro -> ItemOuErro .
+op livrosDe : Biblioteca IdUsuario -> Acervo .
+op qtdDe : Biblioteca IdUsuario -> Nat .
+op podeAddLivro? : Biblioteca IdLivro -> Bool .
+op podeRemoverLivro? : Biblioteca IdLivro -> Bool .
+op podeRegistrar? : Biblioteca IdUsuario -> Bool .
+op podeRemoverUsuario? : Biblioteca IdUsuario -> Bool .
+op podeEmprestar? : Biblioteca IdLivro IdUsuario -> Bool .
+op podeDevolver? : Biblioteca IdLivro IdUsuario -> Bool .
+op addLivro : Biblioteca IdLivro String -> Biblioteca .
+op removerLivro : Biblioteca IdLivro -> Biblioteca .
+op registrarUsuario : Biblioteca IdUsuario -> Biblioteca .
+op removerUsuario : Biblioteca IdUsuario -> Biblioteca .
+op emprestar : Biblioteca IdLivro IdUsuario -> Biblioteca .
+op devolver : Biblioteca IdLivro IdUsuario -> Biblioteca .
+op idsUnicos? : Biblioteca -> Bool .
+op contagemOk? : Biblioteca -> Bool .
+op usuariosUnicos? : Biblioteca -> Bool .
+op donosRegistrados? : Biblioteca -> Bool .
+op invariante? : Biblioteca -> Bool .
+op donosRegA? : Acervo Usuarios -> Bool .
+op ok : -> Diagnostico [ctor] .
+op errLivroInexistente : -> Diagnostico [ctor] .
+op errLivroJaEmprestado : -> Diagnostico [ctor] .
+op errNaoEmprestadoAoUsuario : -> Diagnostico [ctor] .
+op errLivroEmprestado : -> Diagnostico [ctor] .
+op errIdRepetido : -> Diagnostico [ctor] .
+op errUsuarioRepetido : -> Diagnostico [ctor] .
+op errUsuarioInexistente : -> Diagnostico [ctor] .
+op errUsuarioComLivros : -> Diagnostico [ctor] .
+op errLimiteExcedido : -> Diagnostico [ctor] .
+op diagAddLivro : Biblioteca IdLivro -> Diagnostico .
+op diagRemoverLivro : Biblioteca IdLivro -> Diagnostico .
+op diagRegistrar : Biblioteca IdUsuario -> Diagnostico .
+op diagRemoverUsuario : Biblioteca IdUsuario -> Diagnostico .
+op diagEmprestar : Biblioteca IdLivro IdUsuario -> Diagnostico .
+op diagDevolver : Biblioteca IdLivro IdUsuario -> Diagnostico .
+Bye.

@@ -1,0 +1,893 @@
+$ maude --version
+3.5.1
+$ cd src && maude -no-banner demo-biblioteca.maude < /dev/null
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(lib0) .
+rewrites: 192 in 0ms cpu (0ms real) (14769230 rewrites/second)
+result NzNat: 5
+==========================================
+reduce in DEMO-BIBLIOTECA : totalUsuarios(lib0) .
+rewrites: 190 in 0ms cpu (0ms real) (~ rewrites/second)
+result NzNat: 4
+==========================================
+reduce in DEMO-BIBLIOTECA : pertence?(lib0, l1) .
+rewrites: 218 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : pertence?(lib0, l6) .
+rewrites: 218 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : disponivel?(lib0, l1) .
+rewrites: 187 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdEmprestados(lib0) .
+rewrites: 187 in 0ms cpu (0ms real) (26714285 rewrites/second)
+result Zero: 0
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdDisponiveis(lib0) .
+rewrites: 192 in 0ms cpu (0ms real) (~ rewrites/second)
+result NzNat: 5
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(lib1) .
+rewrites: 917 in 0ms cpu (0ms real) (76416666 rewrites/second)
+result NzNat: 6
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdEmprestados(lib1) .
+rewrites: 915 in 0ms cpu (0ms real) (130714285 rewrites/second)
+result NzNat: 4
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdDisponiveis(lib1) .
+rewrites: 913 in 0ms cpu (0ms real) (41500000 rewrites/second)
+result NzNat: 2
+==========================================
+reduce in DEMO-BIBLIOTECA : possui?(lib1, ana, l1) .
+rewrites: 912 in 0ms cpu (0ms real) (48000000 rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : possui?(lib1, bruno, l3) .
+rewrites: 920 in 0ms cpu (0ms real) (27058823 rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : possui?(lib1, carla, l3) .
+rewrites: 920 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : disponivel?(lib1, l1) .
+rewrites: 910 in 0ms cpu (0ms real) (70000000 rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : disponivel?(lib1, l6) .
+rewrites: 930 in 0ms cpu (0ms real) (34444444 rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(bibliotecaVazia) .
+rewrites: 3 in 0ms cpu (0ms real) (~ rewrites/second)
+result Zero: 0
+==========================================
+reduce in DEMO-BIBLIOTECA : pertence?(bibliotecaVazia, l1) .
+rewrites: 4 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : buscar(lib0, l7) .
+rewrites: 203 in 0ms cpu (0ms real) (~ rewrites/second)
+result ItemOuErro: livroInexistente
+==========================================
+reduce in DEMO-BIBLIOTECA : buscar(lib1, l6) .
+rewrites: 929 in 0ms cpu (0ms real) (~ rewrites/second)
+result Item: item(livro(6), "O chamado de Cthulhu", disponivel)
+==========================================
+reduce in DEMO-BIBLIOTECA : livrosDe(lib1, ana) .
+rewrites: 928 in 0ms cpu (0ms real) (~ rewrites/second)
+result Acervo: item(livro(1), "Dom Casmurro", emprestado(usuario(1))) ; item(
+    livro(2), "Memorias Postumas", emprestado(usuario(1))) ; item(livro(4),
+    "Vidas Secas", emprestado(usuario(1)))
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdDe(lib1, ana) .
+rewrites: 935 in 0ms cpu (0ms real) (42500000 rewrites/second)
+result NzNat: 3
+==========================================
+reduce in DEMO-BIBLIOTECA : livrosDe(lib1, davi) .
+rewrites: 928 in 0ms cpu (0ms real) (~ rewrites/second)
+result Acervo: nilA
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib0, l6,
+    "O chamado de Cthulhu")) .
+rewrites: 237 in 0ms cpu (0ms real) (9875000 rewrites/second)
+result NzNat: 6
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib0, l6,
+    "O chamado de Cthulhu")) == 1 + totalLivros(lib0) .
+rewrites: 251 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(bibliotecaVazia, l6,
+    "O chamado de Cthulhu")) == 1 + totalLivros(bibliotecaVazia) .
+rewrites: 17 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib1, l7, "Novo titulo")) == 1
+    + totalLivros(lib1) .
+rewrites: 985 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(removerLivro(devolver(emprestar(lib0,
+    l5, davi), l5, davi), l5)) .
+rewrites: 454 in 0ms cpu (0ms real) (~ rewrites/second)
+result NzNat: 4
+==========================================
+reduce in DEMO-BIBLIOTECA : pertence?(removerLivro(devolver(emprestar(lib0, l5,
+    davi), l5, davi), l5), l5) .
+rewrites: 474 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : disponivel?(emprestar(lib0, l1, ana), l1) .
+rewrites: 288 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : disponivel?(devolver(emprestar(lib0, l1, ana), l1,
+    ana), l1) .
+rewrites: 303 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : devolver(emprestar(lib0, l1, ana), l1, ana) == lib0
+    .
+rewrites: 298 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : 1 + totalLivros(removerLivro(lib0, l1)) ==
+    totalLivros(lib0) .
+rewrites: 256 in 0ms cpu (0ms real) (32000000 rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : removerLivro(pequena, l1) == biblioteca(nilA, ana)
+    .
+rewrites: 29 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : (totalLivros(removerLivro(lib0, l3)) == 4 and
+    totalLivros(removerLivro(lib0, l5)) == 4) and totalLivros(removerLivro(
+    lib0, l1)) == 4 .
+rewrites: 419 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalUsuarios(registrarUsuario(lib0, usuario(5)))
+    == 5 and removerUsuario(registrarUsuario(lib0, usuario(5)), usuario(5)) ==
+    lib0 .
+rewrites: 296 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(lib0, l7, ana) == lib0 .
+rewrites: 294 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(lib1, l1, bruno) == lib1 .
+rewrites: 1015 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(lib1, l1, ana) == lib1 .
+rewrites: 1021 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : devolver(lib0, l1, ana) == lib0 .
+rewrites: 192 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : devolver(lib1, l1, bruno) == lib1 .
+rewrites: 916 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : removerLivro(lib1, l1) == lib1 .
+rewrites: 959 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : removerLivro(lib0, l7) == lib0 .
+rewrites: 245 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : addLivro(lib0, l1, "Outro titulo") == lib0 .
+rewrites: 224 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib0, l1, "Outro titulo")) .
+rewrites: 235 in 0ms cpu (0ms real) (~ rewrites/second)
+result NzNat: 5
+==========================================
+reduce in DEMO-BIBLIOTECA : registrarUsuario(lib0, ana) == lib0 .
+rewrites: 213 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(lib0, l1, fantasma) == lib0 .
+rewrites: 278 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : removerUsuario(lib1, ana) == lib1 .
+rewrites: 967 in 0ms cpu (0ms real) (34535714 rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : removerUsuario(lib0, fantasma) == lib0 .
+rewrites: 231 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(lib1, l5, ana) == lib1 .
+rewrites: 1037 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(bibliotecaVazia, l1, ana) ==
+    bibliotecaVazia .
+rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdEmprestados(emprestar(lib1, l5, bruno)) .
+rewrites: 1064 in 0ms cpu (0ms real) (~ rewrites/second)
+result NzNat: 5
+==========================================
+reduce in DEMO-BIBLIOTECA : podeEmprestar?(lib1, l5, ana) .
+rewrites: 1034 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : podeEmprestar?(lib1, l5, bruno) .
+rewrites: 1028 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : diagEmprestar(lib0, l7, ana) .
+rewrites: 252 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errLivroInexistente
+==========================================
+reduce in DEMO-BIBLIOTECA : diagEmprestar(lib1, l1, bruno) .
+rewrites: 991 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errLivroJaEmprestado
+==========================================
+reduce in DEMO-BIBLIOTECA : diagEmprestar(lib0, l1, fantasma) .
+rewrites: 212 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errUsuarioInexistente
+==========================================
+reduce in DEMO-BIBLIOTECA : diagEmprestar(lib1, l5, ana) .
+rewrites: 1041 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errLimiteExcedido
+==========================================
+reduce in DEMO-BIBLIOTECA : diagEmprestar(lib1, l5, bruno) .
+rewrites: 1035 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: ok
+==========================================
+reduce in DEMO-BIBLIOTECA : diagDevolver(lib1, l1, bruno) .
+rewrites: 963 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errNaoEmprestadoAoUsuario
+==========================================
+reduce in DEMO-BIBLIOTECA : diagRemoverLivro(lib1, l1) .
+rewrites: 961 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errLivroEmprestado
+==========================================
+reduce in DEMO-BIBLIOTECA : diagAddLivro(lib0, l1) .
+rewrites: 220 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errIdRepetido
+==========================================
+reduce in DEMO-BIBLIOTECA : diagRegistrar(lib0, ana) .
+rewrites: 209 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errUsuarioRepetido
+==========================================
+reduce in DEMO-BIBLIOTECA : diagRemoverUsuario(lib1, ana) .
+rewrites: 967 in 0ms cpu (0ms real) (~ rewrites/second)
+result Diagnostico: errUsuarioComLivros
+==========================================
+reduce in DEMO-BIBLIOTECA : podeDevolver?(lib1, l1, ana) == diagDevolver(lib1,
+    l1, ana) == ok and podeDevolver?(lib1, l1, bruno) == diagDevolver(lib1, l1,
+    bruno) == ok .
+rewrites: 1043 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdEmprestados(lib0) + qtdDisponiveis(lib0) ==
+    totalLivros(lib0) .
+rewrites: 213 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : qtdEmprestados(lib1) + qtdDisponiveis(lib1) ==
+    totalLivros(lib1) .
+rewrites: 941 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : contagemOk?(h1) and contagemOk?(h2) and
+    contagemOk?(h3) and contagemOk?(h4) and contagemOk?(h5) and contagemOk?(h6)
+    and contagemOk?(h7) .
+rewrites: 4313 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : contagemOk?(emprestar(lib1, l1, bruno)) and
+    contagemOk?(removerLivro(lib1, l1)) and contagemOk?(removerLivro(lib0, l3))
+    and contagemOk?(addLivro(lib1, l1, "x")) and contagemOk?(devolver(lib1, l1,
+    ana)) .
+rewrites: 1570 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : invariante?(lib0) and invariante?(h1) and
+    invariante?(h2) and invariante?(h4) and invariante?(h6) and invariante?(
+    lib1) .
+rewrites: 4774 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : invariante?(addLivro(lib1, l7, "Novo")) and
+    idsUnicos?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l1,
+    "Repetido")) and invariante?(removerUsuario(lib1, davi)) and invariante?(
+    emprestar(lib1, l5, ana)) .
+rewrites: 2618 in 0ms cpu (0ms real) (38500000 rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : idsUnicos?(ruim1) .
+rewrites: 24 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : invariante?(ruim1) .
+rewrites: 66 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : donosRegistrados?(ruim2) .
+rewrites: 15 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : usuariosUnicos?(ruim3) .
+rewrites: 20 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: false
+==========================================
+reduce in DEMO-BIBLIOTECA : contagemOk?(ruim1) and contagemOk?(ruim2) .
+rewrites: 41 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(biblioteca(item(livro(1),
+    "Dom Casmurro", disponivel), usuario(1)), livro(6),
+    "O chamado de Cthulhu")) .
+*********** equation
+eq addLivro(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro, T:String) = if
+    podeAddLivro?(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro) then
+    biblioteca(A:Acervo ; item(L:IdLivro, T:String, disponivel), Us:Usuarios)
+    else biblioteca(A:Acervo, Us:Usuarios) fi .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+L:IdLivro --> livro(6)
+T:String --> "O chamado de Cthulhu"
+addLivro(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    livro(6), "O chamado de Cthulhu")
+--->
+if podeAddLivro?(biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1)), livro(6)) then biblioteca(item(livro(1), "Dom Casmurro",
+    disponivel) ; item(livro(6), "O chamado de Cthulhu", disponivel), usuario(
+    1)) else biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1))
+    fi
+*********** equation
+eq podeAddLivro?(B:Biblioteca, L:IdLivro) = not pertence?(B:Biblioteca,
+    L:IdLivro) .
+B:Biblioteca --> biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1))
+L:IdLivro --> livro(6)
+podeAddLivro?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(
+    1)), livro(6))
+--->
+not pertence?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(
+    1)), livro(6))
+*********** equation
+eq pertence?(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro) = existeA?(A:Acervo,
+    L:IdLivro) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+L:IdLivro --> livro(6)
+pertence?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    livro(6))
+--->
+existeA?(item(livro(1), "Dom Casmurro", disponivel), livro(6))
+*********** equation
+eq existeA?(I:Item ; A:Acervo, L:IdLivro) = existeA?(A:Acervo, L:IdLivro) or
+    getId(I:Item) == L:IdLivro .
+I:Item --> item(livro(1), "Dom Casmurro", disponivel)
+A:Acervo --> nilA
+L:IdLivro --> livro(6)
+existeA?(item(livro(1), "Dom Casmurro", disponivel), livro(6))
+--->
+existeA?(nilA, livro(6)) or getId(item(livro(1), "Dom Casmurro", disponivel))
+    == livro(6)
+*********** equation
+eq existeA?(nilA, L:IdLivro) = false .
+L:IdLivro --> livro(6)
+existeA?(nilA, livro(6))
+--->
+false
+*********** equation
+eq getId(item(L:IdLivro, T:String, S:Status)) = L:IdLivro .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+S:Status --> disponivel
+getId(item(livro(1), "Dom Casmurro", disponivel))
+--->
+livro(1)
+*********** equation
+(built-in equation for symbol _==_)
+livro(1) == livro(6)
+--->
+false
+*********** equation
+eq A:Bool or B:Bool = A:Bool and B:Bool xor A:Bool xor B:Bool .
+A:Bool --> false
+B:Bool --> false
+false or false
+--->
+false and false xor false xor false
+*********** equation
+eq false and A:Bool = false .
+A:Bool --> false
+false and false
+--->
+false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> false
+false xor false
+--->
+false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> false
+false xor false
+--->
+false
+*********** equation
+eq not A:Bool = true xor A:Bool .
+A:Bool --> false
+not false
+--->
+true xor false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> true
+true xor false
+--->
+true
+*********** equation
+(built-in equation for symbol if_then_else_fi)
+if true then biblioteca(item(livro(1), "Dom Casmurro", disponivel) ; item(
+    livro(6), "O chamado de Cthulhu", disponivel), usuario(1)) else biblioteca(
+    item(livro(1), "Dom Casmurro", disponivel), usuario(1)) fi
+--->
+biblioteca(item(livro(1), "Dom Casmurro", disponivel) ; item(livro(6),
+    "O chamado de Cthulhu", disponivel), usuario(1))
+*********** equation
+eq totalLivros(biblioteca(A:Acervo, Us:Usuarios)) = totalA(A:Acervo) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel) ; item(livro(6),
+    "O chamado de Cthulhu", disponivel)
+Us:Usuarios --> usuario(1)
+totalLivros(biblioteca(item(livro(1), "Dom Casmurro", disponivel) ; item(livro(
+    6), "O chamado de Cthulhu", disponivel), usuario(1)))
+--->
+totalA(item(livro(1), "Dom Casmurro", disponivel) ; item(livro(6),
+    "O chamado de Cthulhu", disponivel))
+*********** equation
+eq totalA(I:Item ; A:Acervo) = 1 + totalA(A:Acervo) .
+I:Item --> item(livro(1), "Dom Casmurro", disponivel)
+A:Acervo --> item(livro(6), "O chamado de Cthulhu", disponivel)
+totalA(item(livro(1), "Dom Casmurro", disponivel) ; item(livro(6),
+    "O chamado de Cthulhu", disponivel))
+--->
+1 + totalA(item(livro(6), "O chamado de Cthulhu", disponivel))
+*********** equation
+eq totalA(I:Item ; A:Acervo) = 1 + totalA(A:Acervo) .
+I:Item --> item(livro(6), "O chamado de Cthulhu", disponivel)
+A:Acervo --> nilA
+totalA(item(livro(6), "O chamado de Cthulhu", disponivel))
+--->
+1 + totalA(nilA)
+*********** equation
+eq totalA(nilA) = 0 .
+empty substitution
+totalA(nilA)
+--->
+0
+*********** equation
+(built-in equation for symbol _+_)
+0 + 1
+--->
+1
+*********** equation
+(built-in equation for symbol _+_)
+1 + 1
+--->
+2
+rewrites: 20 in 0ms cpu (0ms real) (128205 rewrites/second)
+result NzNat: 2
+==========================================
+reduce in DEMO-BIBLIOTECA : contagemOk?(biblioteca(item(livro(1),
+    "Dom Casmurro", emprestado(usuario(1))), usuario(1))) .
+*********** equation
+eq contagemOk?(B:Biblioteca) = qtdEmprestados(B:Biblioteca) + qtdDisponiveis(
+    B:Biblioteca) == totalLivros(B:Biblioteca) .
+B:Biblioteca --> biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(
+    1))), usuario(1))
+contagemOk?(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(1))),
+    usuario(1)))
+--->
+qtdEmprestados(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(
+    1))), usuario(1))) + qtdDisponiveis(biblioteca(item(livro(1),
+    "Dom Casmurro", emprestado(usuario(1))), usuario(1))) == totalLivros(
+    biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(1))), usuario(
+    1)))
+*********** equation
+eq qtdEmprestados(biblioteca(A:Acervo, Us:Usuarios)) = qtdEmprestadosA(
+    A:Acervo) .
+A:Acervo --> item(livro(1), "Dom Casmurro", emprestado(usuario(1)))
+Us:Usuarios --> usuario(1)
+qtdEmprestados(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(
+    1))), usuario(1)))
+--->
+qtdEmprestadosA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+*********** equation
+eq qtdEmprestadosA(item(L:IdLivro, T:String, emprestado(U:IdUsuario)) ;
+    A:Acervo) = 1 + qtdEmprestadosA(A:Acervo) .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+U:IdUsuario --> usuario(1)
+A:Acervo --> nilA
+qtdEmprestadosA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+--->
+1 + qtdEmprestadosA(nilA)
+*********** equation
+eq qtdEmprestadosA(nilA) = 0 .
+empty substitution
+qtdEmprestadosA(nilA)
+--->
+0
+*********** equation
+(built-in equation for symbol _+_)
+0 + 1
+--->
+1
+*********** equation
+eq qtdDisponiveis(biblioteca(A:Acervo, Us:Usuarios)) = qtdDisponiveisA(
+    A:Acervo) .
+A:Acervo --> item(livro(1), "Dom Casmurro", emprestado(usuario(1)))
+Us:Usuarios --> usuario(1)
+qtdDisponiveis(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(
+    1))), usuario(1)))
+--->
+qtdDisponiveisA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+*********** equation
+eq qtdDisponiveisA(item(L:IdLivro, T:String, emprestado(U:IdUsuario)) ;
+    A:Acervo) = qtdDisponiveisA(A:Acervo) .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+U:IdUsuario --> usuario(1)
+A:Acervo --> nilA
+qtdDisponiveisA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+--->
+qtdDisponiveisA(nilA)
+*********** equation
+eq qtdDisponiveisA(nilA) = 0 .
+empty substitution
+qtdDisponiveisA(nilA)
+--->
+0
+*********** equation
+(built-in equation for symbol _+_)
+0 + 1
+--->
+1
+*********** equation
+eq totalLivros(biblioteca(A:Acervo, Us:Usuarios)) = totalA(A:Acervo) .
+A:Acervo --> item(livro(1), "Dom Casmurro", emprestado(usuario(1)))
+Us:Usuarios --> usuario(1)
+totalLivros(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(1))),
+    usuario(1)))
+--->
+totalA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+*********** equation
+eq totalA(I:Item ; A:Acervo) = 1 + totalA(A:Acervo) .
+I:Item --> item(livro(1), "Dom Casmurro", emprestado(usuario(1)))
+A:Acervo --> nilA
+totalA(item(livro(1), "Dom Casmurro", emprestado(usuario(1))))
+--->
+1 + totalA(nilA)
+*********** equation
+eq totalA(nilA) = 0 .
+empty substitution
+totalA(nilA)
+--->
+0
+*********** equation
+(built-in equation for symbol _+_)
+0 + 1
+--->
+1
+*********** equation
+(built-in equation for symbol _==_)
+1 == 1
+--->
+true
+rewrites: 14 in 0ms cpu (0ms real) (~ rewrites/second)
+result Bool: true
+==========================================
+reduce in DEMO-BIBLIOTECA : emprestar(biblioteca(item(livro(1), "Dom Casmurro",
+    disponivel), usuario(1)), livro(7), usuario(1)) .
+*********** equation
+eq emprestar(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro, U:IdUsuario) = if
+    podeEmprestar?(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro, U:IdUsuario)
+    then biblioteca(definirStatus(A:Acervo, L:IdLivro, emprestado(
+    U:IdUsuario)), Us:Usuarios) else biblioteca(A:Acervo, Us:Usuarios) fi .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+L:IdLivro --> livro(7)
+U:IdUsuario --> usuario(1)
+emprestar(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    livro(7), usuario(1))
+--->
+if podeEmprestar?(biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1)), livro(7), usuario(1)) then biblioteca(definirStatus(item(
+    livro(1), "Dom Casmurro", disponivel), livro(7), emprestado(usuario(1))),
+    usuario(1)) else biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1)) fi
+*********** equation
+eq podeEmprestar?(B:Biblioteca, L:IdLivro, U:IdUsuario) = ((qtdDe(B:Biblioteca,
+    U:IdUsuario) < limiteEmprestimos and disponivel?(B:Biblioteca, L:IdLivro))
+    and pertence?(B:Biblioteca, L:IdLivro)) and existeUsuario?(B:Biblioteca,
+    U:IdUsuario) .
+B:Biblioteca --> biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1))
+L:IdLivro --> livro(7)
+U:IdUsuario --> usuario(1)
+podeEmprestar?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(
+    1)), livro(7), usuario(1))
+--->
+((qtdDe(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    usuario(1)) < limiteEmprestimos and disponivel?(biblioteca(item(livro(1),
+    "Dom Casmurro", disponivel), usuario(1)), livro(7))) and pertence?(
+    biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)), livro(
+    7))) and existeUsuario?(biblioteca(item(livro(1), "Dom Casmurro",
+    disponivel), usuario(1)), usuario(1))
+*********** equation
+eq qtdDe(biblioteca(A:Acervo, Us:Usuarios), U:IdUsuario) = totalA(livrosDeA(
+    A:Acervo, U:IdUsuario)) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+U:IdUsuario --> usuario(1)
+qtdDe(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    usuario(1))
+--->
+totalA(livrosDeA(item(livro(1), "Dom Casmurro", disponivel), usuario(1)))
+*********** equation
+eq livrosDeA(I:Item ; A:Acervo, U:IdUsuario) = if itemDe?(I:Item, U:IdUsuario)
+    then I:Item ; livrosDeA(A:Acervo, U:IdUsuario) else livrosDeA(A:Acervo,
+    U:IdUsuario) fi .
+I:Item --> item(livro(1), "Dom Casmurro", disponivel)
+A:Acervo --> nilA
+U:IdUsuario --> usuario(1)
+livrosDeA(item(livro(1), "Dom Casmurro", disponivel), usuario(1))
+--->
+if itemDe?(item(livro(1), "Dom Casmurro", disponivel), usuario(1)) then item(
+    livro(1), "Dom Casmurro", disponivel) ; livrosDeA(nilA, usuario(1)) else
+    livrosDeA(nilA, usuario(1)) fi
+*********** equation
+eq itemDe?(item(L:IdLivro, T:String, disponivel), U:IdUsuario) = false .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+U:IdUsuario --> usuario(1)
+itemDe?(item(livro(1), "Dom Casmurro", disponivel), usuario(1))
+--->
+false
+*********** equation
+(built-in equation for symbol if_then_else_fi)
+if false then item(livro(1), "Dom Casmurro", disponivel) ; livrosDeA(nilA,
+    usuario(1)) else livrosDeA(nilA, usuario(1)) fi
+--->
+livrosDeA(nilA, usuario(1))
+*********** equation
+eq livrosDeA(nilA, U:IdUsuario) = nilA .
+U:IdUsuario --> usuario(1)
+livrosDeA(nilA, usuario(1))
+--->
+nilA
+*********** equation
+eq totalA(nilA) = 0 .
+empty substitution
+totalA(nilA)
+--->
+0
+*********** equation
+eq limiteEmprestimos = 3 .
+empty substitution
+limiteEmprestimos
+--->
+3
+*********** equation
+(built-in equation for symbol _<_)
+0 < 3
+--->
+true
+*********** equation
+eq disponivel?(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro) = disponivelA?(
+    A:Acervo, L:IdLivro) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+L:IdLivro --> livro(7)
+disponivel?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    livro(7))
+--->
+disponivelA?(item(livro(1), "Dom Casmurro", disponivel), livro(7))
+*********** equation
+eq disponivelA?(I:Item ; A:Acervo, L:IdLivro) = if getId(I:Item) == L:IdLivro
+    then itemDisponivel?(I:Item) else disponivelA?(A:Acervo, L:IdLivro) fi .
+I:Item --> item(livro(1), "Dom Casmurro", disponivel)
+A:Acervo --> nilA
+L:IdLivro --> livro(7)
+disponivelA?(item(livro(1), "Dom Casmurro", disponivel), livro(7))
+--->
+if getId(item(livro(1), "Dom Casmurro", disponivel)) == livro(7) then
+    itemDisponivel?(item(livro(1), "Dom Casmurro", disponivel)) else
+    disponivelA?(nilA, livro(7)) fi
+*********** equation
+eq getId(item(L:IdLivro, T:String, S:Status)) = L:IdLivro .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+S:Status --> disponivel
+getId(item(livro(1), "Dom Casmurro", disponivel))
+--->
+livro(1)
+*********** equation
+(built-in equation for symbol _==_)
+livro(1) == livro(7)
+--->
+false
+*********** equation
+(built-in equation for symbol if_then_else_fi)
+if false then itemDisponivel?(item(livro(1), "Dom Casmurro", disponivel)) else
+    disponivelA?(nilA, livro(7)) fi
+--->
+disponivelA?(nilA, livro(7))
+*********** equation
+eq disponivelA?(nilA, L:IdLivro) = false .
+L:IdLivro --> livro(7)
+disponivelA?(nilA, livro(7))
+--->
+false
+*********** equation
+eq true and A:Bool = A:Bool .
+A:Bool --> false
+true and false
+--->
+false
+*********** equation
+eq pertence?(biblioteca(A:Acervo, Us:Usuarios), L:IdLivro) = existeA?(A:Acervo,
+    L:IdLivro) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+L:IdLivro --> livro(7)
+pertence?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)),
+    livro(7))
+--->
+existeA?(item(livro(1), "Dom Casmurro", disponivel), livro(7))
+*********** equation
+eq existeA?(I:Item ; A:Acervo, L:IdLivro) = existeA?(A:Acervo, L:IdLivro) or
+    getId(I:Item) == L:IdLivro .
+I:Item --> item(livro(1), "Dom Casmurro", disponivel)
+A:Acervo --> nilA
+L:IdLivro --> livro(7)
+existeA?(item(livro(1), "Dom Casmurro", disponivel), livro(7))
+--->
+existeA?(nilA, livro(7)) or getId(item(livro(1), "Dom Casmurro", disponivel))
+    == livro(7)
+*********** equation
+eq existeA?(nilA, L:IdLivro) = false .
+L:IdLivro --> livro(7)
+existeA?(nilA, livro(7))
+--->
+false
+*********** equation
+eq getId(item(L:IdLivro, T:String, S:Status)) = L:IdLivro .
+L:IdLivro --> livro(1)
+T:String --> "Dom Casmurro"
+S:Status --> disponivel
+getId(item(livro(1), "Dom Casmurro", disponivel))
+--->
+livro(1)
+*********** equation
+(built-in equation for symbol _==_)
+livro(1) == livro(7)
+--->
+false
+*********** equation
+eq A:Bool or B:Bool = A:Bool and B:Bool xor A:Bool xor B:Bool .
+A:Bool --> false
+B:Bool --> false
+false or false
+--->
+false and false xor false xor false
+*********** equation
+eq false and A:Bool = false .
+A:Bool --> false
+false and false
+--->
+false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> false
+false xor false
+--->
+false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> false
+false xor false
+--->
+false
+*********** equation
+eq false and A:Bool = false .
+A:Bool --> false
+false and false
+--->
+false
+*********** equation
+eq existeUsuario?(biblioteca(A:Acervo, Us:Usuarios), U:IdUsuario) = existeU?(
+    Us:Usuarios, U:IdUsuario) .
+A:Acervo --> item(livro(1), "Dom Casmurro", disponivel)
+Us:Usuarios --> usuario(1)
+U:IdUsuario --> usuario(1)
+existeUsuario?(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(
+    1)), usuario(1))
+--->
+existeU?(usuario(1), usuario(1))
+*********** equation
+eq existeU?(U:IdUsuario & Us:Usuarios, U1:IdUsuario) = existeU?(Us:Usuarios,
+    U1:IdUsuario) or U:IdUsuario == U1:IdUsuario .
+U:IdUsuario --> usuario(1)
+Us:Usuarios --> nilU
+U1:IdUsuario --> usuario(1)
+existeU?(usuario(1), usuario(1))
+--->
+existeU?(nilU, usuario(1)) or usuario(1) == usuario(1)
+*********** equation
+eq existeU?(nilU, U1:IdUsuario) = false .
+U1:IdUsuario --> usuario(1)
+existeU?(nilU, usuario(1))
+--->
+false
+*********** equation
+(built-in equation for symbol _==_)
+usuario(1) == usuario(1)
+--->
+true
+*********** equation
+eq A:Bool or B:Bool = A:Bool and B:Bool xor A:Bool xor B:Bool .
+A:Bool --> false
+B:Bool --> true
+true or false
+--->
+false and true xor false xor true
+*********** equation
+eq true and A:Bool = A:Bool .
+A:Bool --> false
+true and false
+--->
+false
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> true
+true xor false
+--->
+true
+*********** equation
+eq false xor A:Bool = A:Bool .
+A:Bool --> true
+true xor false
+--->
+true
+*********** equation
+eq true and A:Bool = A:Bool .
+A:Bool --> false
+true and false
+--->
+false
+*********** equation
+(built-in equation for symbol if_then_else_fi)
+if false then biblioteca(definirStatus(item(livro(1), "Dom Casmurro",
+    disponivel), livro(7), emprestado(usuario(1))), usuario(1)) else
+    biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)) fi
+--->
+biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1))
+rewrites: 37 in 0ms cpu (0ms real) (141762 rewrites/second)
+result Biblioteca: biblioteca(item(livro(1), "Dom Casmurro", disponivel),
+    usuario(1))
+Bye.

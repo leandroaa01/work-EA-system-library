@@ -1,0 +1,433 @@
+*** ============================================================
+*** demo-biblioteca.maude: Especificação BIBLIOTECA em ação
+***
+*** Execução: maude -no-banner demo-biblioteca.maude
+***
+*** Formato de cada teste:
+***   *** (n) descrição [regra/propriedade]
+***   *** esperado: <valor>
+***   reduce <termo> .
+*** (Como no CafeOBJ, o comentário vem ANTES do termo, nunca no meio.)
+*** Obs.: em Maude, uma linha "*** (" abre comentário de bloco; por isso
+*** os comentários numerados abaixo usam "*** [n]" e não "*** (n)".
+*** ============================================================
+load biblioteca.maude
+
+fmod DEMO-BIBLIOTECA is
+  protecting DIAGNOSTICO .
+
+  *** ----- Usuários -----
+  ops ana bruno carla davi fantasma : -> IdUsuario .
+  eq ana      = usuario(1) .
+  eq bruno    = usuario(2) .
+  eq carla    = usuario(3) .
+  eq davi     = usuario(4) .
+  *** fantasma: nunca é registrado em nenhum estado da demo
+  eq fantasma = usuario(99) .
+
+  *** ----- Livros (l7 nunca entra no acervo) -----
+  ops l1 l2 l3 l4 l5 l6 l7 : -> IdLivro .
+  eq l1 = livro(1) .
+  eq l2 = livro(2) .
+  eq l3 = livro(3) .
+  eq l4 = livro(4) .
+  eq l5 = livro(5) .
+  eq l6 = livro(6) .
+  eq l7 = livro(7) .
+
+  *** ----- Estado inicial: 4 usuários registrados, 5 livros disponíveis -----
+  op lib0 : -> Biblioteca .
+  eq lib0 =
+     addLivro(addLivro(addLivro(addLivro(addLivro(
+       registrarUsuario(registrarUsuario(registrarUsuario(registrarUsuario(
+         bibliotecaVazia, ana), bruno), carla), davi),
+       l1, "Dom Casmurro"),
+       l2, "Memorias Postumas"),
+       l3, "Grande Sertao Veredas"),
+       l4, "Vidas Secas"),
+       l5, "Capitaes da Areia") .
+
+  *** ----- "História" da biblioteca, na ordem: -----
+  ***   h1. entra o livro l6, "O chamado de Cthulhu"
+  ***   h2. Ana pega l1
+  ***   h3. Ana pega l2
+  ***   h4. Ana pega l4 (Ana passa a ter 3 livros: o limite)
+  ***   h5. Bruno pega l3
+  ***   h6. Bruno devolve l3
+  ***   h7. Carla pega l3
+  *** Resultado: l1 l2 l4 com Ana; l3 com Carla; l5 e l6 disponíveis.
+  ops h1 h2 h3 h4 h5 h6 h7 lib1 : -> Biblioteca .
+  eq h1 = addLivro(lib0, l6, "O chamado de Cthulhu") .
+  eq h2 = emprestar(h1, l1, ana) .
+  eq h3 = emprestar(h2, l2, ana) .
+  eq h4 = emprestar(h3, l4, ana) .
+  eq h5 = emprestar(h4, l3, bruno) .
+  eq h6 = devolver(h5, l3, bruno) .
+  eq h7 = emprestar(h6, l3, carla) .
+  eq lib1 = h7 .
+
+  *** ----- Estado mínimo (para as reescritas passo a passo) -----
+  op pequena : -> Biblioteca .
+  eq pequena = biblioteca(item(l1, "Dom Casmurro", disponivel), ana) .
+
+  *** ----- Estados montados à mão, INVÁLIDOS (fora de qualquer história) -----
+  *** ruim1: id de livro repetido (viola R6)
+  *** ruim2: livro emprestado a usuário não registrado
+  *** ruim3: usuário registrado duas vezes (viola E1)
+  ops ruim1 ruim2 ruim3 : -> Biblioteca .
+  eq ruim1 = biblioteca(item(l1, "A", disponivel) ; item(l1, "B", emprestado(ana)), ana) .
+  eq ruim2 = biblioteca(item(l1, "A", emprestado(fantasma)), ana) .
+  eq ruim3 = biblioteca(nilA, ana & ana) .
+endfm
+
+select DEMO-BIBLIOTECA .
+
+*** ============================================================
+*** A. Consultas básicas
+*** ============================================================
+
+*** [1] Total de livros do estado inicial [F10]
+*** esperado: 5
+reduce totalLivros(lib0) .
+
+*** [2] Usuários registrados no estado inicial [F3]
+*** esperado: 4
+reduce totalUsuarios(lib0) .
+
+*** [3] l1 pertence ao acervo? [F7]
+*** esperado: true
+reduce pertence?(lib0, l1) .
+
+*** [4] l6 ainda não pertence a lib0 (elemento procurado não existe) [F7]
+*** esperado: false
+reduce pertence?(lib0, l6) .
+
+*** [5] l1 está disponível em lib0? [F8]
+*** esperado: true
+reduce disponivel?(lib0, l1) .
+
+*** [6] Nenhum empréstimo em lib0 [F11]
+*** esperado: 0
+reduce qtdEmprestados(lib0) .
+
+*** [7] Disponíveis em lib0
+*** esperado: 5
+reduce qtdDisponiveis(lib0) .
+
+*** [8] Total em lib1 (lib0 mais Cthulhu)
+*** esperado: 6
+reduce totalLivros(lib1) .
+
+*** [9] Emprestados em lib1: l1 l2 l4 (Ana) e l3 (Carla) [F11]
+*** esperado: 4
+reduce qtdEmprestados(lib1) .
+
+*** [10] Disponíveis em lib1: l5 e l6
+*** esperado: 2
+reduce qtdDisponiveis(lib1) .
+
+*** [11] Ana possui l1? [F9]
+*** esperado: true
+reduce possui?(lib1, ana, l1) .
+
+*** [12] Bruno devolveu l3, logo não possui [F9]
+*** esperado: false
+reduce possui?(lib1, bruno, l3) .
+
+*** [13] Carla possui l3 [F9]
+*** esperado: true
+reduce possui?(lib1, carla, l3) .
+
+*** [14] l1 está emprestado em lib1: não disponível
+*** esperado: false
+reduce disponivel?(lib1, l1) .
+
+*** [15] l6 continua disponível em lib1
+*** esperado: true
+reduce disponivel?(lib1, l6) .
+
+*** [16] Estrutura vazia (fronteira): total da biblioteca vazia
+*** esperado: 0
+reduce totalLivros(bibliotecaVazia) .
+
+*** [17] Estrutura vazia: nada pertence
+*** esperado: false
+reduce pertence?(bibliotecaVazia, l1) .
+
+*** ============================================================
+*** B. Busca com erro explícito e livros de um usuário
+*** ============================================================
+
+*** [18] Busca de livro inexistente devolve a constante de erro
+*** esperado: livroInexistente
+reduce buscar(lib0, l7) .
+
+*** [19] Busca de livro existente devolve o item
+*** esperado: item(livro(6), "O chamado de Cthulhu", disponivel)
+reduce buscar(lib1, l6) .
+
+*** [20] Livros de Ana em lib1: VÁRIOS livros emprestados ao mesmo usuário
+*** esperado: item(livro(1), "Dom Casmurro", emprestado(usuario(1))) ; item(livro(2), "Memorias Postumas", emprestado(usuario(1))) ; item(livro(4), "Vidas Secas", emprestado(usuario(1)))
+reduce livrosDe(lib1, ana) .
+
+*** [21] Quantidade de livros de Ana
+*** esperado: 3
+reduce qtdDe(lib1, ana) .
+
+*** [22] Davi não tem livros: acervo vazio
+*** esperado: nilA
+reduce livrosDe(lib1, davi) .
+
+*** ============================================================
+*** C. Exemplo-guia: totalLivros(addLivro(B, x)) = totalLivros(B) + 1  [P1]
+*** ============================================================
+
+*** [23] O valor: 5 + 1
+*** esperado: 6
+reduce totalLivros(addLivro(lib0, l6, "O chamado de Cthulhu")) .
+
+*** [24] A propriedade para B = lib0
+*** esperado: true
+reduce totalLivros(addLivro(lib0, l6, "O chamado de Cthulhu")) == totalLivros(lib0) + 1 .
+
+*** [25] A propriedade para B = vazia (caso de fronteira)
+*** esperado: true
+reduce totalLivros(addLivro(bibliotecaVazia, l6, "O chamado de Cthulhu")) == totalLivros(bibliotecaVazia) + 1 .
+
+*** [26] A propriedade para B = lib1 (com empréstimos)
+*** esperado: true
+reduce totalLivros(addLivro(lib1, l7, "Novo titulo")) == totalLivros(lib1) + 1 .
+
+*** ============================================================
+*** D. Operações compostas e regra R3
+*** ============================================================
+
+*** [27] emprestar -> devolver -> removerLivro de l5: total cai para 4 [R3, R5]
+*** esperado: 4
+reduce totalLivros(removerLivro(devolver(emprestar(lib0, l5, davi), l5, davi), l5)) .
+
+*** [28] ... e l5 não pertence mais ao acervo
+*** esperado: false
+reduce pertence?(removerLivro(devolver(emprestar(lib0, l5, davi), l5, davi), l5), l5) .
+
+*** [29] R3, antes: após emprestar l1, ele não está disponível
+*** esperado: false
+reduce disponivel?(emprestar(lib0, l1, ana), l1) .
+
+*** [30] R3, depois: após devolver, l1 volta a estar disponível [P2]
+*** esperado: true
+reduce disponivel?(devolver(emprestar(lib0, l1, ana), l1, ana), l1) .
+
+*** [31] P2 forte: devolver desfaz emprestar (restaura o estado inteiro)
+*** esperado: true
+reduce devolver(emprestar(lib0, l1, ana), l1, ana) == lib0 .
+
+*** [32] Remoção de livro disponível: total diminui em 1 [F2]
+*** esperado: true
+reduce totalLivros(removerLivro(lib0, l1)) + 1 == totalLivros(lib0) .
+
+*** [33] Remover o ÚNICO livro do acervo (fronteira): volta ao estado sem livros
+*** esperado: true
+reduce removerLivro(pequena, l1) == biblioteca(nilA, ana) .
+
+*** [34] Remover o primeiro, o do meio e o último de lib0
+*** esperado: true
+reduce (totalLivros(removerLivro(lib0, l1)) == 4) and (totalLivros(removerLivro(lib0, l3)) == 4) and (totalLivros(removerLivro(lib0, l5)) == 4) .
+
+*** [35] Registrar usuário novo e remover usuário sem livros [F3, F4]
+*** esperado: true
+reduce (totalUsuarios(registrarUsuario(lib0, usuario(5))) == 5) and (removerUsuario(registrarUsuario(lib0, usuario(5)), usuario(5)) == lib0) .
+
+*** ============================================================
+*** E. Situações INVÁLIDAS: o estado NÃO muda
+*** ============================================================
+
+*** [36] I1, R1: emprestar livro inexistente
+*** esperado: true
+reduce emprestar(lib0, l7, ana) == lib0 .
+
+*** [37] I2, R2: emprestar livro já emprestado (a outro usuário)
+*** esperado: true
+reduce emprestar(lib1, l1, bruno) == lib1 .
+
+*** [38] I2, R2: emprestar de novo ao mesmo usuário que já o tem
+*** esperado: true
+reduce emprestar(lib1, l1, ana) == lib1 .
+
+*** [39] I3, R4: devolver livro que não está emprestado
+*** esperado: true
+reduce devolver(lib0, l1, ana) == lib0 .
+
+*** [40] I4, R4: devolver livro emprestado a OUTRO usuário
+*** esperado: true
+reduce devolver(lib1, l1, bruno) == lib1 .
+
+*** [41] I5, R5: remover livro emprestado
+*** esperado: true
+reduce removerLivro(lib1, l1) == lib1 .
+
+*** [42] I5b, R5: remover livro inexistente
+*** esperado: true
+reduce removerLivro(lib0, l7) == lib0 .
+
+*** [43] I6, R6: adicionar livro com id repetido (mesmo com outro título)
+*** esperado: true
+reduce addLivro(lib0, l1, "Outro titulo") == lib0 .
+
+*** [44] I6, R6: o total de livros não muda
+*** esperado: 5
+reduce totalLivros(addLivro(lib0, l1, "Outro titulo")) .
+
+*** [45] I7, E1: registrar usuário duplicado
+*** esperado: true
+reduce registrarUsuario(lib0, ana) == lib0 .
+
+*** [46] I8, E3: emprestar a usuário não registrado
+*** esperado: true
+reduce emprestar(lib0, l1, fantasma) == lib0 .
+
+*** [47] I9, E2: remover usuário com livros emprestados
+*** esperado: true
+reduce removerUsuario(lib1, ana) == lib1 .
+
+*** [48] I9b, E2: remover usuário inexistente
+*** esperado: true
+reduce removerUsuario(lib0, fantasma) == lib0 .
+
+*** [49] I10, E4: Ana já tem 3 livros (limite): quarto empréstimo é recusado
+*** esperado: true
+reduce emprestar(lib1, l5, ana) == lib1 .
+
+*** [50] Fronteira: emprestar em biblioteca vazia
+*** esperado: true
+reduce emprestar(bibliotecaVazia, l1, ana) == bibliotecaVazia .
+
+*** [51] P3: operação inválida e válida diferem no efeito: Bruno pode pegar l5
+*** esperado: 5
+reduce qtdEmprestados(emprestar(lib1, l5, bruno)) .
+
+*** ============================================================
+*** F. Guardas e diagnóstico com erro explícito
+*** ============================================================
+
+*** [52] Guarda do empréstimo bloqueado pelo limite
+*** esperado: false
+reduce podeEmprestar?(lib1, l5, ana) .
+
+*** [53] Guarda do empréstimo permitido
+*** esperado: true
+reduce podeEmprestar?(lib1, l5, bruno) .
+
+*** [54] Diagnóstico R1
+*** esperado: errLivroInexistente
+reduce diagEmprestar(lib0, l7, ana) .
+
+*** [55] Diagnóstico R2
+*** esperado: errLivroJaEmprestado
+reduce diagEmprestar(lib1, l1, bruno) .
+
+*** [56] Diagnóstico E3
+*** esperado: errUsuarioInexistente
+reduce diagEmprestar(lib0, l1, fantasma) .
+
+*** [57] Diagnóstico E4
+*** esperado: errLimiteExcedido
+reduce diagEmprestar(lib1, l5, ana) .
+
+*** [58] Diagnóstico de empréstimo válido
+*** esperado: ok
+reduce diagEmprestar(lib1, l5, bruno) .
+
+*** [59] Diagnóstico R4 (livro de outro usuário)
+*** esperado: errNaoEmprestadoAoUsuario
+reduce diagDevolver(lib1, l1, bruno) .
+
+*** [60] Diagnóstico R5
+*** esperado: errLivroEmprestado
+reduce diagRemoverLivro(lib1, l1) .
+
+*** [61] Diagnóstico R6
+*** esperado: errIdRepetido
+reduce diagAddLivro(lib0, l1) .
+
+*** [62] Diagnóstico E1
+*** esperado: errUsuarioRepetido
+reduce diagRegistrar(lib0, ana) .
+
+*** [63] Diagnóstico E2
+*** esperado: errUsuarioComLivros
+reduce diagRemoverUsuario(lib1, ana) .
+
+*** [64] Guarda e diagnóstico concordam: podeDevolver? <=> diagDevolver == ok
+*** esperado: true
+reduce (podeDevolver?(lib1, l1, ana) == (diagDevolver(lib1, l1, ana) == ok)) and (podeDevolver?(lib1, l1, bruno) == (diagDevolver(lib1, l1, bruno) == ok)) .
+
+*** ============================================================
+*** G. R7 e invariantes
+*** ============================================================
+
+*** [65] R7 em lib0: #disp + #emp == #total
+*** esperado: true
+reduce qtdDisponiveis(lib0) + qtdEmprestados(lib0) == totalLivros(lib0) .
+
+*** [66] R7 em lib1
+*** esperado: true
+reduce qtdDisponiveis(lib1) + qtdEmprestados(lib1) == totalLivros(lib1) .
+
+*** [67] R7 nos estados intermediários h1..h7 da história
+*** esperado: true
+reduce contagemOk?(h1) and contagemOk?(h2) and contagemOk?(h3) and contagemOk?(h4) and contagemOk?(h5) and contagemOk?(h6) and contagemOk?(h7) .
+
+*** [68] R7 após operações inválidas e após remoções [P4]
+*** esperado: true
+reduce contagemOk?(emprestar(lib1, l1, bruno)) and contagemOk?(removerLivro(lib1, l1)) and contagemOk?(removerLivro(lib0, l3)) and contagemOk?(devolver(lib1, l1, ana)) and contagemOk?(addLivro(lib1, l1, "x")) .
+
+*** [69] invariante? em estados da história [P4]
+*** esperado: true
+reduce invariante?(lib0) and invariante?(h1) and invariante?(h2) and invariante?(h4) and invariante?(h6) and invariante?(lib1) .
+
+*** [70] invariante? preservado por operações válidas e inválidas [P4, P5]
+*** esperado: true
+reduce invariante?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l1, "Repetido")) and invariante?(removerUsuario(lib1, davi)) and invariante?(emprestar(lib1, l5, ana)) .
+
+*** [71] Estado montado à mão com ids repetidos: idsUnicos? = false [R6]
+*** esperado: false
+reduce idsUnicos?(ruim1) .
+
+*** [72] ... logo o invariante falha
+*** esperado: false
+reduce invariante?(ruim1) .
+
+*** [73] Livro emprestado a usuário não registrado: donosRegistrados? = false
+*** esperado: false
+reduce donosRegistrados?(ruim2) .
+
+*** [74] Usuário duplicado: usuariosUnicos? = false [E1]
+*** esperado: false
+reduce usuariosUnicos?(ruim3) .
+
+*** [75] Mesmo nos estados inválidos, a contagem R7 vale (Status só tem 2 construtores)
+*** esperado: true
+reduce contagemOk?(ruim1) and contagemOk?(ruim2) .
+
+*** ============================================================
+*** H. Reescrita passo a passo (set trace)
+*** Termos pequenos, para a derivação caber na tela.
+*** ============================================================
+*** TRACE-BEGIN
+
+*** Os termos usam literais (livro(1), usuario(1)) em vez das constantes
+*** da demo, para o trace não mostrar a expansão de constantes.
+set trace on .
+set trace whole off .
+
+*** [T1] Exemplo-guia (P1): totalLivros(addLivro(B, Cthulhu)) -> 2, B com 1 livro
+reduce totalLivros(addLivro(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)), livro(6), "O chamado de Cthulhu")) .
+
+*** [T2] R7 num estado com um empréstimo: contagemOk? -> true
+reduce contagemOk?(biblioteca(item(livro(1), "Dom Casmurro", emprestado(usuario(1))), usuario(1))) .
+
+*** [T3] R1: emprestar livro inexistente (livro(7)) deixa o estado inalterado
+reduce emprestar(biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)), livro(7), usuario(1)) .
+
+set trace off .

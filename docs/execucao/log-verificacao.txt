@@ -1,0 +1,9 @@
+75 testes conferidos, 0 divergencia(s)
+2000 historicos; checagens: {'F1': 2000, 'F2': 2000, 'F3': 12000, 'F4': 12000}; falhas: 0
+cobertura das guardas (valido/invalido):
+  AddLivro          559 /  1441
+  RemoverLivro     1189 /   811
+  Registrar         750 /  1250
+  RemoverUsuario    804 /  1196
+  Emprestar         715 /  1285
+  Devolver           69 /  1931

@@ -17,8 +17,24 @@ git clone https://github.com/leandroaa01/work-EA-system-library.git
 cd work-EA-system-library
 ```
 
-3. Compile and build the program:
+3. Run the specification (requires [Maude](https://maude.cs.illinois.edu/) 3.x):
 
 ```bash
-@TODO
+cd src
+maude -no-banner demo-biblioteca.maude < /dev/null
 ```
+
+4. (Optional) Check every `result` against the `*** esperado:` comments and run the randomized property test:
+
+```bash
+maude -no-banner demo-biblioteca.maude < /dev/null > ../docs/execucao/log-demo.txt
+python3 verificar.py demo-biblioteca.maude ../docs/execucao/log-demo.txt
+python3 fuzz.py maude 2000
+```
+
+## Layout
+
+- `src/biblioteca.maude`: layered modules `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO`.
+- `src/demo-biblioteca.maude`: `DEMO-BIBLIOTECA` with 75 numbered tests and 3 step-by-step traces.
+- `docs/relatorio.md`: the report (in Portuguese).
+- `docs/execucao/`: real execution logs and the module signature.

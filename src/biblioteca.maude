@@ -1,0 +1,456 @@
+*** ============================================================
+*** biblioteca.maude: Especificação algébrica de um Sistema de Biblioteca
+***
+*** Módulos em camadas (cada um protege o anterior):
+***   LIVRO-USUARIO -> ACERVO ----\
+***                 -> USUARIOS ---+-> BIBLIOTECA -> DIAGNOSTICO
+***
+*** Execução: maude -no-banner demo-biblioteca.maude
+***
+*** Convenções
+***  - Identificadores em português.
+***  - [ctor] marca CONSTRUTORES (geram todos os valores canônicos).
+***    Operadores sem [ctor] são DEFINIDOS: toda aplicação deles a
+***    termos fechados é reescrita (por equações) até construtores.
+***  - Política de operação inválida: estado INALTERADO, via guarda
+***    "if podeX? then ... else <estado original> fi". Além disso,
+***    buscar e o módulo DIAGNOSTICO oferecem ERRO EXPLÍCITO.
+***  - Regras: R1..R7 do enunciado; extras E1..E4 (justificadas no
+***    relatório): E1 usuário não duplicado; E2 não remover usuário com
+***    livros; E3 emprestar só a usuário registrado; E4 limite de
+***    empréstimos por usuário.
+***
+*** Mecanismos Maude usados (significado formal):
+***  - fmod ... endfm: módulo funcional. Semântica = álgebra inicial
+***    da teoria equacional (T_{Sigma/E}): dois termos fechados são
+***    iguais sse deduzíveis das equações (módulo os axiomas).
+***  - [ctor]: declara o operador como construtor (parte Sigma_C da
+***    assinatura). Não altera a semântica; documenta e permite checar
+***    suficiente completude (todo termo fechado definido reduz a
+***    um termo só de construtores).
+***  - subsort A < B: inclusão dos carregadores, A subconjunto de B;
+***    um termo de sort A pode ocupar posição de sort B.
+***  - assoc: o operador binário * satisfaz (x*y)*z = x*(y*z); equações
+***    e casamento valem módulo esta lei.
+***  - id: e: e é elemento neutro, e*x = x = x*e.
+***    assoc + id: formam um MONÓIDE (M, *, e) (lista finita).
+***  - if_then_else_fi: operador interno; "if true then a else b fi = a"
+***    e "if false then a else b fi = b" (equações built-in).
+***  - == e =/=: igualdade/desigualdade entre formas normais (decidível
+***    aqui pois a especificação é confluente e terminante).
+***  - ceq e owise NÃO são usados (guardas feitas com if_then_else_fi,
+***    como no exemplo do professor). ceq l = r if c é a equação
+***    condicional: vale l = r exatamente quando c reduz a true;
+***    [owise] aplica a equação só se nenhuma outra casar.
+*** ============================================================
+
+
+*** ------------------------------------------------------------
+*** LIVRO-USUARIO: identificadores, status e item do acervo
+*** ------------------------------------------------------------
+fmod LIVRO-USUARIO is
+  protecting NAT .
+  protecting STRING .
+  protecting BOOL .
+
+  *** IdLivro/IdUsuario são sorts DISTINTOS (embora ambos baseados em Nat):
+  *** livro(1) e usuario(1) nunca se confundem (tipagem).
+  sorts IdLivro IdUsuario Status Item .
+
+  *** ----- Construtores -----
+  op livro   : Nat -> IdLivro   [ctor] .
+  op usuario : Nat -> IdUsuario [ctor] .
+
+  *** Status de um livro: disponível OU emprestado a um usuário.
+  *** Embute a relação usuário-livro no dado (torna R7 não trivial).
+  op disponivel : -> Status [ctor] .
+  op emprestado : IdUsuario -> Status [ctor] .
+
+  *** Item do acervo: (identificação, título, status)
+  op item : IdLivro String Status -> Item [ctor] .
+
+  *** ----- Projeções (definidas) -----
+  op getId     : Item -> IdLivro .
+  op getTitulo : Item -> String .
+  op getStatus : Item -> Status .
+
+  *** ----- Auxiliares (definidos) -----
+  op comStatus       : Item Status -> Item .   *** mesmo item, novo status
+  op itemDisponivel? : Item -> Bool .
+  op itemDe?         : Item IdUsuario -> Bool . *** item emprestado a esse usuário?
+
+  *** ----- Variáveis -----
+  var  L  : IdLivro .
+  vars U U1 : IdUsuario .
+  var  T  : String .
+  vars S S1 : Status .
+
+  *** Projeções: uma equação por projeção, sobre o construtor
+  eq getId(item(L, T, S))     = L .
+  eq getTitulo(item(L, T, S)) = T .
+  eq getStatus(item(L, T, S)) = S .
+
+  eq comStatus(item(L, T, S), S1) = item(L, T, S1) .
+
+  eq itemDisponivel?(item(L, T, disponivel))    = true .
+  eq itemDisponivel?(item(L, T, emprestado(U))) = false .
+
+  eq itemDe?(item(L, T, disponivel), U)          = false .
+  eq itemDe?(item(L, T, emprestado(U1)), U)      = (U1 == U) .
+endfm
+
+
+*** ------------------------------------------------------------
+*** ACERVO: coleção de itens como MONÓIDE (lista)
+*** ------------------------------------------------------------
+fmod ACERVO is
+  protecting LIVRO-USUARIO .
+
+  sorts Acervo ItemOuErro .
+  *** Um item é um acervo unitário; e um item é um resultado possível de busca
+  subsort Item < Acervo .
+  subsort Item < ItemOuErro .
+
+  *** ----- Construtores -----
+  *** A estrutura (Acervo, _;_, nilA) é um MONÓIDE:
+  ***   associatividade: (a ; b) ; c = a ; (b ; c)
+  ***   identidade:      nilA ; a = a = a ; nilA
+  *** Os atributos assoc e id: declaram essas leis; todas as equações
+  *** abaixo valem módulo elas (por isso "I ; A" casa com qualquer
+  *** acervo não vazio: I = primeiro item, A = resto, possivelmente nilA).
+  op nilA : -> Acervo [ctor] .
+  op _;_  : Acervo Acervo -> Acervo [ctor assoc id: nilA] .
+
+  *** Erro de busca (análogo a contaInexistente do exemplo do banco)
+  op livroInexistente : -> ItemOuErro [ctor] .
+
+  *** ----- Consultas ao nível de coleção (definidas) -----
+  op totalA          : Acervo -> Nat .
+  op qtdDisponiveisA : Acervo -> Nat .
+  op qtdEmprestadosA : Acervo -> Nat .
+  op existeA?        : Acervo IdLivro -> Bool .
+  op disponivelA?    : Acervo IdLivro -> Bool .
+  op possuiA?        : Acervo IdUsuario IdLivro -> Bool .
+  op buscarA         : Acervo IdLivro -> ItemOuErro .
+  op livrosDeA       : Acervo IdUsuario -> Acervo .
+  op idsUnicosA?     : Acervo -> Bool .      *** R6 (invariante)
+
+  *** ----- Modificadores ao nível de coleção (auxiliares, SEM guarda) -----
+  *** A guarda (podeX?) fica na camada BIBLIOTECA.
+  op removerA      : Acervo IdLivro -> Acervo .
+  op definirStatus : Acervo IdLivro Status -> Acervo .
+
+  *** ----- Variáveis -----
+  var  A : Acervo .
+  var  I : Item .
+  vars L L1 : IdLivro .
+  vars U : IdUsuario .
+  var  T : String .
+  var  S : Status .
+
+  *** ----- total (R7: total do acervo) -----
+  eq totalA(nilA)   = 0 .
+  eq totalA(I ; A)  = 1 + totalA(A) .
+
+  *** ----- R7: contagem separada por status -----
+  *** Cada item cai em exatamente um dos dois construtores de Status.
+  eq qtdDisponiveisA(nilA) = 0 .
+  eq qtdDisponiveisA(item(L, T, disponivel) ; A)    = 1 + qtdDisponiveisA(A) .
+  eq qtdDisponiveisA(item(L, T, emprestado(U)) ; A) = qtdDisponiveisA(A) .
+
+  eq qtdEmprestadosA(nilA) = 0 .
+  eq qtdEmprestadosA(item(L, T, disponivel) ; A)    = qtdEmprestadosA(A) .
+  eq qtdEmprestadosA(item(L, T, emprestado(U)) ; A) = 1 + qtdEmprestadosA(A) .
+
+  *** ----- pertinência: vazio -> false; não vazio -> cabeça ou resto -----
+  eq existeA?(nilA, L)   = false .
+  eq existeA?(I ; A, L)  = (getId(I) == L) or existeA?(A, L) .
+
+  *** ----- disponibilidade: inexistente também dá false -----
+  eq disponivelA?(nilA, L)  = false .
+  eq disponivelA?(I ; A, L) =
+     if getId(I) == L then itemDisponivel?(I) else disponivelA?(A, L) fi .
+
+  *** ----- posse: U tem o livro L? (R4) -----
+  eq possuiA?(nilA, U, L)  = false .
+  eq possuiA?(I ; A, U, L) =
+     if getId(I) == L then itemDe?(I, U) else possuiA?(A, U, L) fi .
+
+  *** ----- busca com erro explícito -----
+  eq buscarA(nilA, L)  = livroInexistente .
+  eq buscarA(I ; A, L) = if getId(I) == L then I else buscarA(A, L) fi .
+
+  *** ----- livros emprestados a U (análogo a contasDe) -----
+  eq livrosDeA(nilA, U)  = nilA .
+  eq livrosDeA(I ; A, U) =
+     if itemDe?(I, U) then I ; livrosDeA(A, U) else livrosDeA(A, U) fi .
+
+  *** ----- R6: ids únicos (como numerosUnicos? do banco) -----
+  eq idsUnicosA?(nilA)  = true .
+  eq idsUnicosA?(I ; A) = not existeA?(A, getId(I)) and idsUnicosA?(A) .
+
+  *** ----- remoção por id (elemento ausente: acervo inalterado) -----
+  eq removerA(nilA, L)  = nilA .
+  eq removerA(I ; A, L) =
+     if getId(I) == L then A else I ; removerA(A, L) fi .
+
+  *** ----- atualização do status de um item (ausente: inalterado) -----
+  eq definirStatus(nilA, L, S)  = nilA .
+  eq definirStatus(I ; A, L, S) =
+     if getId(I) == L then comStatus(I, S) ; A
+     else I ; definirStatus(A, L, S) fi .
+endfm
+
+
+*** ------------------------------------------------------------
+*** USUARIOS: coleção de usuários registrados (também um monóide)
+*** ------------------------------------------------------------
+fmod USUARIOS is
+  protecting LIVRO-USUARIO .
+
+  sort Usuarios .
+  subsort IdUsuario < Usuarios .
+
+  *** A estrutura (Usuarios, _&_, nilU) é um monóide, como Acervo
+  op nilU : -> Usuarios [ctor] .
+  op _&_  : Usuarios Usuarios -> Usuarios [ctor assoc id: nilU] .
+
+  op totalU    : Usuarios -> Nat .
+  op existeU?  : Usuarios IdUsuario -> Bool .
+  op removerU  : Usuarios IdUsuario -> Usuarios .
+  op unicosU?  : Usuarios -> Bool .          *** E1 (invariante)
+
+  vars U U1 : IdUsuario .
+  var  Us : Usuarios .
+
+  eq totalU(nilU)     = 0 .
+  eq totalU(U & Us)   = 1 + totalU(Us) .
+
+  eq existeU?(nilU, U1)    = false .
+  eq existeU?(U & Us, U1)  = (U == U1) or existeU?(Us, U1) .
+
+  eq removerU(nilU, U1)    = nilU .
+  eq removerU(U & Us, U1)  = if U == U1 then Us else U & removerU(Us, U1) fi .
+
+  eq unicosU?(nilU)    = true .
+  eq unicosU?(U & Us)  = not existeU?(Us, U) and unicosU?(Us) .
+endfm
+
+
+*** ------------------------------------------------------------
+*** BIBLIOTECA: estado global e operações públicas
+*** ------------------------------------------------------------
+fmod BIBLIOTECA is
+  protecting ACERVO .
+  protecting USUARIOS .
+
+  sort Biblioteca .
+
+  *** ----- Construtor do estado (análogo a BANCO, mas com 2 coleções) -----
+  op biblioteca : Acervo Usuarios -> Biblioteca [ctor] .
+
+  *** ----- Constantes definidas -----
+  op bibliotecaVazia  : -> Biblioteca .
+  op limiteEmprestimos : -> Nat .          *** E4
+
+  *** ----- Consultas (funcionalidades 7 a 11) -----
+  op totalLivros    : Biblioteca -> Nat .                       *** F10
+  op qtdEmprestados : Biblioteca -> Nat .                       *** F11
+  op qtdDisponiveis : Biblioteca -> Nat .
+  op totalUsuarios  : Biblioteca -> Nat .
+  op pertence?      : Biblioteca IdLivro -> Bool .              *** F7
+  op disponivel?    : Biblioteca IdLivro -> Bool .              *** F8
+  op possui?        : Biblioteca IdUsuario IdLivro -> Bool .    *** F9
+  op existeUsuario? : Biblioteca IdUsuario -> Bool .
+  op buscar         : Biblioteca IdLivro -> ItemOuErro .
+  op livrosDe       : Biblioteca IdUsuario -> Acervo .
+  op qtdDe          : Biblioteca IdUsuario -> Nat .  *** nº de livros emprestados a U
+
+  *** ----- Predicados de guarda -----
+  op podeAddLivro?       : Biblioteca IdLivro -> Bool .             *** R6
+  op podeRemoverLivro?   : Biblioteca IdLivro -> Bool .             *** R5
+  op podeRegistrar?      : Biblioteca IdUsuario -> Bool .           *** E1
+  op podeRemoverUsuario? : Biblioteca IdUsuario -> Bool .           *** E2
+  op podeEmprestar?      : Biblioteca IdLivro IdUsuario -> Bool .   *** R1 R2 E3 E4
+  op podeDevolver?       : Biblioteca IdLivro IdUsuario -> Bool .   *** R4
+
+  *** ----- Modificadores (funcionalidades 1 a 6) -----
+  op addLivro         : Biblioteca IdLivro String -> Biblioteca .   *** F1
+  op removerLivro     : Biblioteca IdLivro -> Biblioteca .          *** F2
+  op registrarUsuario : Biblioteca IdUsuario -> Biblioteca .        *** F3
+  op removerUsuario   : Biblioteca IdUsuario -> Biblioteca .        *** F4
+  op emprestar        : Biblioteca IdLivro IdUsuario -> Biblioteca . *** F5
+  op devolver         : Biblioteca IdLivro IdUsuario -> Biblioteca . *** F6
+
+  *** ----- Invariantes -----
+  op idsUnicos?        : Biblioteca -> Bool .   *** R6
+  op contagemOk?       : Biblioteca -> Bool .   *** R7
+  op usuariosUnicos?   : Biblioteca -> Bool .   *** E1
+  op donosRegistrados? : Biblioteca -> Bool .   *** todo empréstimo é de usuário registrado
+  op invariante?       : Biblioteca -> Bool .   *** R6 e R7 e E1 e E3 (estado)
+
+  *** ----- Auxiliar recursivo sobre Acervo -----
+  op donosRegA? : Acervo Usuarios -> Bool .
+
+  *** ----- Variáveis -----
+  var  A  : Acervo .
+  var  I  : Item .
+  var  Us : Usuarios .
+  vars L L1 : IdLivro .
+  vars U U1 : IdUsuario .
+  var  T  : String .
+  var  B  : Biblioteca .
+
+  eq bibliotecaVazia   = biblioteca(nilA, nilU) .
+  eq limiteEmprestimos = 3 .
+
+  *** ----- Consultas -----
+  eq totalLivros(biblioteca(A, Us))    = totalA(A) .
+  eq qtdEmprestados(biblioteca(A, Us)) = qtdEmprestadosA(A) .
+  eq qtdDisponiveis(biblioteca(A, Us)) = qtdDisponiveisA(A) .
+  eq totalUsuarios(biblioteca(A, Us))  = totalU(Us) .
+
+  eq pertence?(biblioteca(A, Us), L)      = existeA?(A, L) .
+  eq disponivel?(biblioteca(A, Us), L)    = disponivelA?(A, L) .
+  eq possui?(biblioteca(A, Us), U, L)     = possuiA?(A, U, L) .
+  eq existeUsuario?(biblioteca(A, Us), U) = existeU?(Us, U) .
+  eq buscar(biblioteca(A, Us), L)         = buscarA(A, L) .
+  eq livrosDe(biblioteca(A, Us), U)       = livrosDeA(A, U) .
+  eq qtdDe(biblioteca(A, Us), U)          = totalA(livrosDeA(A, U)) .
+
+  *** ----- Guardas -----
+  *** R6: o id do novo livro não pode existir
+  eq podeAddLivro?(B, L) = not pertence?(B, L) .
+
+  *** R5: só remove se pertence e está disponível
+  eq podeRemoverLivro?(B, L) = pertence?(B, L) and disponivel?(B, L) .
+
+  *** E1: não registrar usuário duplicado
+  eq podeRegistrar?(B, U) = not existeUsuario?(B, U) .
+
+  *** E2: só remove usuário que existe e não tem livros emprestados
+  eq podeRemoverUsuario?(B, U) = existeUsuario?(B, U) and (qtdDe(B, U) == 0) .
+
+  *** R1 (pertence), R2 (disponível), E3 (usuário registrado), E4 (limite)
+  eq podeEmprestar?(B, L, U) =
+     existeUsuario?(B, U) and pertence?(B, L) and disponivel?(B, L)
+     and (qtdDe(B, U) < limiteEmprestimos) .
+
+  *** R4: só devolve o livro que está emprestado a ESSE usuário
+  *** Obs.: possui? já implica que o livro pertence ao acervo
+  eq podeDevolver?(B, L, U) = possui?(B, U, L) .
+
+  *** ----- Modificadores: inválido => estado inalterado -----
+  *** F1 + R6: adiciona no fim do acervo, como disponível
+  eq addLivro(biblioteca(A, Us), L, T) =
+     if podeAddLivro?(biblioteca(A, Us), L)
+     then biblioteca(A ; item(L, T, disponivel), Us)
+     else biblioteca(A, Us) fi .
+
+  *** F2 + R5
+  eq removerLivro(biblioteca(A, Us), L) =
+     if podeRemoverLivro?(biblioteca(A, Us), L)
+     then biblioteca(removerA(A, L), Us)
+     else biblioteca(A, Us) fi .
+
+  *** F3 + E1
+  eq registrarUsuario(biblioteca(A, Us), U) =
+     if podeRegistrar?(biblioteca(A, Us), U)
+     then biblioteca(A, Us & U)
+     else biblioteca(A, Us) fi .
+
+  *** F4 + E2
+  eq removerUsuario(biblioteca(A, Us), U) =
+     if podeRemoverUsuario?(biblioteca(A, Us), U)
+     then biblioteca(A, removerU(Us, U))
+     else biblioteca(A, Us) fi .
+
+  *** F5 + R1 + R2 + E3 + E4
+  eq emprestar(biblioteca(A, Us), L, U) =
+     if podeEmprestar?(biblioteca(A, Us), L, U)
+     then biblioteca(definirStatus(A, L, emprestado(U)), Us)
+     else biblioteca(A, Us) fi .
+
+  *** F6 + R3 + R4: devolver torna o livro disponível de novo
+  eq devolver(biblioteca(A, Us), L, U) =
+     if podeDevolver?(biblioteca(A, Us), L, U)
+     then biblioteca(definirStatus(A, L, disponivel), Us)
+     else biblioteca(A, Us) fi .
+
+  *** ----- Invariantes -----
+  eq idsUnicos?(biblioteca(A, Us))      = idsUnicosA?(A) .
+  eq usuariosUnicos?(biblioteca(A, Us)) = unicosU?(Us) .
+
+  *** R7: (#disponíveis) + (#emprestados) = (#total)
+  eq contagemOk?(B) = (qtdDisponiveis(B) + qtdEmprestados(B)) == totalLivros(B) .
+
+  eq donosRegistrados?(biblioteca(A, Us)) = donosRegA?(A, Us) .
+
+  eq donosRegA?(nilA, Us) = true .
+  eq donosRegA?(item(L, T, disponivel) ; A, Us)    = donosRegA?(A, Us) .
+  eq donosRegA?(item(L, T, emprestado(U)) ; A, Us) =
+     existeU?(Us, U) and donosRegA?(A, Us) .
+
+  eq invariante?(B) =
+     idsUnicos?(B) and contagemOk?(B) and usuariosUnicos?(B)
+     and donosRegistrados?(B) .
+endfm
+
+
+*** ------------------------------------------------------------
+*** DIAGNOSTICO: versões com ERRO EXPLÍCITO das operações inválidas
+*** Complementa a política de "estado inalterado"
+*** ------------------------------------------------------------
+fmod DIAGNOSTICO is
+  protecting BIBLIOTECA .
+
+  sort Diagnostico .
+
+  op ok                       : -> Diagnostico [ctor] .
+  op errLivroInexistente      : -> Diagnostico [ctor] .   *** R1
+  op errLivroJaEmprestado     : -> Diagnostico [ctor] .   *** R2
+  op errNaoEmprestadoAoUsuario : -> Diagnostico [ctor] .  *** R4
+  op errLivroEmprestado       : -> Diagnostico [ctor] .   *** R5
+  op errIdRepetido            : -> Diagnostico [ctor] .   *** R6
+  op errUsuarioRepetido       : -> Diagnostico [ctor] .   *** E1
+  op errUsuarioInexistente    : -> Diagnostico [ctor] .   *** E2/E3
+  op errUsuarioComLivros      : -> Diagnostico [ctor] .   *** E2
+  op errLimiteExcedido        : -> Diagnostico [ctor] .   *** E4
+
+  op diagAddLivro         : Biblioteca IdLivro -> Diagnostico .
+  op diagRemoverLivro     : Biblioteca IdLivro -> Diagnostico .
+  op diagRegistrar        : Biblioteca IdUsuario -> Diagnostico .
+  op diagRemoverUsuario   : Biblioteca IdUsuario -> Diagnostico .
+  op diagEmprestar        : Biblioteca IdLivro IdUsuario -> Diagnostico .
+  op diagDevolver         : Biblioteca IdLivro IdUsuario -> Diagnostico .
+
+  var  B : Biblioteca .
+  var  L : IdLivro .
+  var  U : IdUsuario .
+
+  eq diagAddLivro(B, L) =
+     if pertence?(B, L) then errIdRepetido else ok fi .
+
+  eq diagRemoverLivro(B, L) =
+     if not pertence?(B, L) then errLivroInexistente
+     else if not disponivel?(B, L) then errLivroEmprestado else ok fi fi .
+
+  eq diagRegistrar(B, U) =
+     if existeUsuario?(B, U) then errUsuarioRepetido else ok fi .
+
+  eq diagRemoverUsuario(B, U) =
+     if not existeUsuario?(B, U) then errUsuarioInexistente
+     else if qtdDe(B, U) =/= 0 then errUsuarioComLivros else ok fi fi .
+
+  eq diagEmprestar(B, L, U) =
+     if not existeUsuario?(B, U) then errUsuarioInexistente
+     else if not pertence?(B, L) then errLivroInexistente
+     else if not disponivel?(B, L) then errLivroJaEmprestado
+     else if qtdDe(B, U) >= limiteEmprestimos then errLimiteExcedido
+     else ok fi fi fi fi .
+
+  eq diagDevolver(B, L, U) =
+     if not pertence?(B, L) then errLivroInexistente
+     else if not possui?(B, U, L) then errNaoEmprestadoAoUsuario
+     else ok fi fi .
+endfm
