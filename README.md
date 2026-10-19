@@ -37,4 +37,7 @@ python3 fuzz.py maude 2000
 - `src/biblioteca.maude`: layered modules `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO`.
 - `src/demo-biblioteca.maude`: `DEMO-BIBLIOTECA` with 75 numbered tests and 3 step-by-step traces.
 - `docs/relatorio.md`: the report (in Portuguese).
+- `docs/resumo-projeto.md`: project summary and design decisions (what to explain).
+- `docs/como-rodar.md`: how to run the code and read Maude's output.
+- `docs/apresentacao.md`: presentation guide (script, demo, likely questions).
 - `docs/execucao/`: real execution logs and the module signature.
