@@ -1,31 +1,19 @@
-*** ============================================================
-*** demo-biblioteca.maude: Especificação BIBLIOTECA em ação
-***
-*** Execução: maude -no-banner demo-biblioteca.maude
-***
-*** Formato de cada teste:
-***   *** (n) descrição [regra/propriedade]
-***   *** esperado: <valor>
-***   reduce <termo> .
-*** (Como no CafeOBJ, o comentário vem ANTES do termo, nunca no meio.)
-*** Obs.: em Maude, uma linha "*** (" abre comentário de bloco; por isso
-*** os comentários numerados abaixo usam "*** [n]" e não "*** (n)".
-*** ============================================================
+*** Testes do sistema de biblioteca. Execução: maude -no-banner demo-biblioteca.maude
+
 load biblioteca.maude
 
 fmod DEMO-BIBLIOTECA is
   protecting DIAGNOSTICO .
 
-  *** ----- Usuários -----
   ops ana bruno carla davi fantasma : -> IdUsuario .
   eq ana      = usuario(1) .
   eq bruno    = usuario(2) .
   eq carla    = usuario(3) .
   eq davi     = usuario(4) .
-  *** fantasma: nunca é registrado em nenhum estado da demo
+  *** fantasma nunca é registrado
   eq fantasma = usuario(99) .
 
-  *** ----- Livros (l7 nunca entra no acervo) -----
+  *** l7 nunca entra no acervo
   ops l1 l2 l3 l4 l5 l6 l7 : -> IdLivro .
   eq l1 = livro(1) .
   eq l2 = livro(2) .
@@ -35,7 +23,7 @@ fmod DEMO-BIBLIOTECA is
   eq l6 = livro(6) .
   eq l7 = livro(7) .
 
-  *** ----- Estado inicial: 4 usuários registrados, 5 livros disponíveis -----
+  *** 4 usuários e 5 livros disponíveis
   op lib0 : -> Biblioteca .
   eq lib0 =
      addLivro(addLivro(addLivro(addLivro(addLivro(
@@ -47,15 +35,8 @@ fmod DEMO-BIBLIOTECA is
        l4, "Vidas Secas"),
        l5, "Capitaes da Areia") .
 
-  *** ----- "História" da biblioteca, na ordem: -----
-  ***   h1. entra o livro l6, "O chamado de Cthulhu"
-  ***   h2. Ana pega l1
-  ***   h3. Ana pega l2
-  ***   h4. Ana pega l4 (Ana passa a ter 3 livros: o limite)
-  ***   h5. Bruno pega l3
-  ***   h6. Bruno devolve l3
-  ***   h7. Carla pega l3
-  *** Resultado: l1 l2 l4 com Ana; l3 com Carla; l5 e l6 disponíveis.
+  *** h1: entra o l6 (Cthulhu); h2 a h4: Ana pega l1, l2 e l4; h5: Bruno pega l3;
+  *** h6: Bruno devolve l3; h7: Carla pega l3
   ops h1 h2 h3 h4 h5 h6 h7 lib1 : -> Biblioteca .
   eq h1 = addLivro(lib0, l6, "O chamado de Cthulhu") .
   eq h2 = emprestar(h1, l1, ana) .
@@ -66,14 +47,11 @@ fmod DEMO-BIBLIOTECA is
   eq h7 = emprestar(h6, l3, carla) .
   eq lib1 = h7 .
 
-  *** ----- Estado mínimo (para as reescritas passo a passo) -----
   op pequena : -> Biblioteca .
   eq pequena = biblioteca(item(l1, "Dom Casmurro", disponivel), ana) .
 
-  *** ----- Estados montados à mão, INVÁLIDOS (fora de qualquer história) -----
-  *** ruim1: id de livro repetido (viola R6)
-  *** ruim2: livro emprestado a usuário não registrado
-  *** ruim3: usuário registrado duas vezes (viola E1)
+  *** estados inválidos montados à mão:
+  *** ruim1 tem id repetido, ruim2 tem dono não registrado, ruim3 tem usuário repetido
   ops ruim1 ruim2 ruim3 : -> Biblioteca .
   eq ruim1 = biblioteca(item(l1, "A", disponivel) ; item(l1, "B", emprestado(ana)), ana) .
   eq ruim2 = biblioteca(item(l1, "A", emprestado(fantasma)), ana) .
@@ -82,9 +60,7 @@ endfm
 
 select DEMO-BIBLIOTECA .
 
-*** ============================================================
 *** A. Consultas básicas
-*** ============================================================
 
 *** [1] Total de livros do estado inicial [F10]
 *** esperado: 5
@@ -154,9 +130,7 @@ reduce totalLivros(bibliotecaVazia) .
 *** esperado: false
 reduce pertence?(bibliotecaVazia, l1) .
 
-*** ============================================================
 *** B. Busca com erro explícito e livros de um usuário
-*** ============================================================
 
 *** [18] Busca de livro inexistente devolve a constante de erro
 *** esperado: livroInexistente
@@ -178,9 +152,7 @@ reduce qtdDe(lib1, ana) .
 *** esperado: nilA
 reduce livrosDe(lib1, davi) .
 
-*** ============================================================
 *** C. Exemplo-guia: totalLivros(addLivro(B, x)) = totalLivros(B) + 1  [P1]
-*** ============================================================
 
 *** [23] O valor: 5 + 1
 *** esperado: 6
@@ -198,9 +170,7 @@ reduce totalLivros(addLivro(bibliotecaVazia, l6, "O chamado de Cthulhu")) == tot
 *** esperado: true
 reduce totalLivros(addLivro(lib1, l7, "Novo titulo")) == totalLivros(lib1) + 1 .
 
-*** ============================================================
 *** D. Operações compostas e regra R3
-*** ============================================================
 
 *** [27] emprestar -> devolver -> removerLivro de l5: total cai para 4 [R3, R5]
 *** esperado: 4
@@ -238,9 +208,7 @@ reduce (totalLivros(removerLivro(lib0, l1)) == 4) and (totalLivros(removerLivro(
 *** esperado: true
 reduce (totalUsuarios(registrarUsuario(lib0, usuario(5))) == 5) and (removerUsuario(registrarUsuario(lib0, usuario(5)), usuario(5)) == lib0) .
 
-*** ============================================================
 *** E. Situações INVÁLIDAS: o estado NÃO muda
-*** ============================================================
 
 *** [36] I1, R1: emprestar livro inexistente
 *** esperado: true
@@ -306,9 +274,7 @@ reduce emprestar(bibliotecaVazia, l1, ana) == bibliotecaVazia .
 *** esperado: 5
 reduce qtdEmprestados(emprestar(lib1, l5, bruno)) .
 
-*** ============================================================
 *** F. Guardas e diagnóstico com erro explícito
-*** ============================================================
 
 *** [52] Guarda do empréstimo bloqueado pelo limite
 *** esperado: false
@@ -362,9 +328,7 @@ reduce diagRemoverUsuario(lib1, ana) .
 *** esperado: true
 reduce (podeDevolver?(lib1, l1, ana) == (diagDevolver(lib1, l1, ana) == ok)) and (podeDevolver?(lib1, l1, bruno) == (diagDevolver(lib1, l1, bruno) == ok)) .
 
-*** ============================================================
 *** G. R7 e invariantes
-*** ============================================================
 
 *** [65] R7 em lib0: #disp + #emp == #total
 *** esperado: true
@@ -410,14 +374,10 @@ reduce usuariosUnicos?(ruim3) .
 *** esperado: true
 reduce contagemOk?(ruim1) and contagemOk?(ruim2) .
 
-*** ============================================================
 *** H. Reescrita passo a passo (set trace)
-*** Termos pequenos, para a derivação caber na tela.
-*** ============================================================
 *** TRACE-BEGIN
 
-*** Os termos usam literais (livro(1), usuario(1)) em vez das constantes
-*** da demo, para o trace não mostrar a expansão de constantes.
+*** termos literais, para o trace não expandir as constantes
 set trace on .
 set trace whole off .
 

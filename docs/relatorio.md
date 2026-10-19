@@ -492,7 +492,7 @@ python3 fuzz.py maude 2000        # opcional: teste aleatório
 
 | Arquivo | Conteúdo |
 |---|---|
-| `src/biblioteca.maude` | 5 módulos: `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO` (código completo e comentado) |
+| `src/biblioteca.maude` | 5 módulos: `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO` (código completo) |
 | `src/demo-biblioteca.maude` | `DEMO-BIBLIOTECA`, 75 testes numerados + 3 traces |
 | `docs/execucao/log-demo.txt` | log real completo |
 | `docs/execucao/log-verificacao.txt` | saída do `verificar.py` e do `fuzz.py` |

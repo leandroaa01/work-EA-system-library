@@ -3,7 +3,7 @@ $ maude --version
 $ cd src && maude -no-banner demo-biblioteca.maude < /dev/null
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(lib0) .
-rewrites: 192 in 0ms cpu (0ms real) (14769230 rewrites/second)
+rewrites: 192 in 0ms cpu (0ms real) (3692307 rewrites/second)
 result NzNat: 5
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalUsuarios(lib0) .
@@ -31,7 +31,7 @@ rewrites: 192 in 0ms cpu (0ms real) (~ rewrites/second)
 result NzNat: 5
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(lib1) .
-rewrites: 917 in 0ms cpu (0ms real) (76416666 rewrites/second)
+rewrites: 917 in 0ms cpu (0ms real) (39869565 rewrites/second)
 result NzNat: 6
 ==========================================
 reduce in DEMO-BIBLIOTECA : qtdEmprestados(lib1) .
@@ -39,11 +39,11 @@ rewrites: 915 in 0ms cpu (0ms real) (130714285 rewrites/second)
 result NzNat: 4
 ==========================================
 reduce in DEMO-BIBLIOTECA : qtdDisponiveis(lib1) .
-rewrites: 913 in 0ms cpu (0ms real) (41500000 rewrites/second)
+rewrites: 913 in 0ms cpu (0ms real) (50722222 rewrites/second)
 result NzNat: 2
 ==========================================
 reduce in DEMO-BIBLIOTECA : possui?(lib1, ana, l1) .
-rewrites: 912 in 0ms cpu (0ms real) (48000000 rewrites/second)
+rewrites: 912 in 0ms cpu (0ms real) (50666666 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : possui?(lib1, bruno, l3) .
@@ -59,7 +59,7 @@ rewrites: 910 in 0ms cpu (0ms real) (70000000 rewrites/second)
 result Bool: false
 ==========================================
 reduce in DEMO-BIBLIOTECA : disponivel?(lib1, l6) .
-rewrites: 930 in 0ms cpu (0ms real) (34444444 rewrites/second)
+rewrites: 930 in 0ms cpu (0ms real) (35769230 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(bibliotecaVazia) .
@@ -85,7 +85,7 @@ result Acervo: item(livro(1), "Dom Casmurro", emprestado(usuario(1))) ; item(
     "Vidas Secas", emprestado(usuario(1)))
 ==========================================
 reduce in DEMO-BIBLIOTECA : qtdDe(lib1, ana) .
-rewrites: 935 in 0ms cpu (0ms real) (42500000 rewrites/second)
+rewrites: 935 in 0ms cpu (0ms real) (~ rewrites/second)
 result NzNat: 3
 ==========================================
 reduce in DEMO-BIBLIOTECA : livrosDe(lib1, davi) .
@@ -94,7 +94,7 @@ result Acervo: nilA
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib0, l6,
     "O chamado de Cthulhu")) .
-rewrites: 237 in 0ms cpu (0ms real) (9875000 rewrites/second)
+rewrites: 237 in 0ms cpu (0ms real) (~ rewrites/second)
 result NzNat: 6
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib0, l6,
@@ -109,7 +109,7 @@ result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(addLivro(lib1, l7, "Novo titulo")) == 1
     + totalLivros(lib1) .
-rewrites: 985 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 985 in 0ms cpu (0ms real) (49250000 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : totalLivros(removerLivro(devolver(emprestar(lib0,
@@ -138,7 +138,7 @@ result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : 1 + totalLivros(removerLivro(lib0, l1)) ==
     totalLivros(lib0) .
-rewrites: 256 in 0ms cpu (0ms real) (32000000 rewrites/second)
+rewrites: 256 in 0ms cpu (0ms real) (~ rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : removerLivro(pequena, l1) == biblioteca(nilA, ana)
@@ -203,7 +203,7 @@ rewrites: 278 in 0ms cpu (0ms real) (~ rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : removerUsuario(lib1, ana) == lib1 .
-rewrites: 967 in 0ms cpu (0ms real) (34535714 rewrites/second)
+rewrites: 967 in 0ms cpu (0ms real) (~ rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : removerUsuario(lib0, fantasma) == lib0 .
@@ -220,7 +220,7 @@ rewrites: 21 in 0ms cpu (0ms real) (~ rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : qtdEmprestados(emprestar(lib1, l5, bruno)) .
-rewrites: 1064 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 1064 in 0ms cpu (0ms real) (26600000 rewrites/second)
 result NzNat: 5
 ==========================================
 reduce in DEMO-BIBLIOTECA : podeEmprestar?(lib1, l5, ana) .
@@ -264,7 +264,7 @@ rewrites: 220 in 0ms cpu (0ms real) (~ rewrites/second)
 result Diagnostico: errIdRepetido
 ==========================================
 reduce in DEMO-BIBLIOTECA : diagRegistrar(lib0, ana) .
-rewrites: 209 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 209 in 0ms cpu (0ms real) (29857142 rewrites/second)
 result Diagnostico: errUsuarioRepetido
 ==========================================
 reduce in DEMO-BIBLIOTECA : diagRemoverUsuario(lib1, ana) .
@@ -290,7 +290,7 @@ result Bool: true
 reduce in DEMO-BIBLIOTECA : contagemOk?(h1) and contagemOk?(h2) and
     contagemOk?(h3) and contagemOk?(h4) and contagemOk?(h5) and contagemOk?(h6)
     and contagemOk?(h7) .
-rewrites: 4313 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 4313 in 0ms cpu (0ms real) (33960629 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : contagemOk?(emprestar(lib1, l1, bruno)) and
@@ -310,7 +310,7 @@ reduce in DEMO-BIBLIOTECA : invariante?(addLivro(lib1, l7, "Novo")) and
     idsUnicos?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l1,
     "Repetido")) and invariante?(removerUsuario(lib1, davi)) and invariante?(
     emprestar(lib1, l5, ana)) .
-rewrites: 2618 in 0ms cpu (0ms real) (38500000 rewrites/second)
+rewrites: 2618 in 0ms cpu (0ms real) (37942028 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : idsUnicos?(ruim1) .
@@ -489,7 +489,7 @@ totalA(nilA)
 1 + 1
 --->
 2
-rewrites: 20 in 0ms cpu (0ms real) (128205 rewrites/second)
+rewrites: 20 in 0ms cpu (0ms real) (141843 rewrites/second)
 result NzNat: 2
 ==========================================
 reduce in DEMO-BIBLIOTECA : contagemOk?(biblioteca(item(livro(1),
@@ -598,7 +598,7 @@ totalA(nilA)
 1 == 1
 --->
 true
-rewrites: 14 in 0ms cpu (0ms real) (~ rewrites/second)
+rewrites: 14 in 0ms cpu (0ms real) (241379 rewrites/second)
 result Bool: true
 ==========================================
 reduce in DEMO-BIBLIOTECA : emprestar(biblioteca(item(livro(1), "Dom Casmurro",
@@ -887,7 +887,7 @@ if false then biblioteca(definirStatus(item(livro(1), "Dom Casmurro",
     biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1)) fi
 --->
 biblioteca(item(livro(1), "Dom Casmurro", disponivel), usuario(1))
-rewrites: 37 in 0ms cpu (0ms real) (141762 rewrites/second)
+rewrites: 37 in 0ms cpu (0ms real) (141221 rewrites/second)
 result Biblioteca: biblioteca(item(livro(1), "Dom Casmurro", disponivel),
     usuario(1))
 Bye.
