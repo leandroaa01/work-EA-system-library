@@ -1,0 +1,125 @@
+in conta.mod
+
+mod DEMO {
+  protecting(CONTA)
+
+  -- ----------------------------------------------------------
+  -- 4 clientes
+  -- ----------------------------------------------------------
+  ops ana bruno carla davi : -> Cliente .
+  eq ana   = newCliente("Ana Souza",     "111.111.111-11", "ana@email.com") .
+  eq bruno = newCliente("Bruno Lima",    "222.222.222-22", "bruno@email.com") .
+  eq carla = newCliente("Carla Mendes",  "333.333.333-33", "carla@email.com") .
+  eq davi  = newCliente("Davi Oliveira", "444.444.444-44", "davi@email.com") .
+
+  -- ----------------------------------------------------------
+  -- 6 contas: Ana e Bruno têm corrente e poupança,
+  --           Carla só corrente, Davi só poupança
+  -- criarCorrente(Número, Agência, Titular, Limite, TaxaOp)
+  -- criarPoupanca(Número, Agência, Titular, TaxaOp, TaxaRend)
+  -- ----------------------------------------------------------
+  ops anaCC anaPP brunoCC brunoPP carlaCC daviPP : -> Conta .
+  eq anaCC   = criarCorrente(1001, 1, ana,   100000, 150) .  -- limite R$ 1.000,00; taxa R$ 1,50
+  eq anaPP   = criarPoupanca(1002, 1, ana,   0,      50) .   -- sem taxa; rende 0,5%
+  eq brunoCC = criarCorrente(2001, 1, bruno, 50000,  200) .  -- limite R$ 500,00; taxa R$ 2,00
+  eq brunoPP = criarPoupanca(2002, 1, bruno, 100,    60) .   -- taxa R$ 1,00; rende 0,6%
+  eq carlaCC = criarCorrente(3001, 2, carla, 0,      100) .  -- sem limite; taxa R$ 1,00
+  eq daviPP  = criarPoupanca(4001, 2, davi,  0,      70) .   -- sem taxa; rende 0,7%
+}
+
+select DEMO .
+
+-- ============================================================
+-- Projeções sobre contas recém-criadas
+-- ============================================================
+
+-- (1) Quem é o titular da poupança de Bruno?
+red getName(getTitular(brunoPP)) .                    -- "Bruno Lima"
+
+-- (2) Conta recém-criada: saldo zero e histórico vazio
+red getSaldo(anaCC) .                                 -- 0
+red getHistorico(anaCC) .                             -- nilTX
+
+-- ============================================================
+-- Depósitos
+-- ============================================================
+
+-- (3) Ana deposita R$ 500,00 na corrente (paga R$ 1,50 de taxa)
+red getSaldo(depositar(anaCC, 50000, "2026-10-01 09:00")) .          -- 49850
+
+-- (4) Depósito menor que a taxa é recusado: estado não muda
+red getSaldo(depositar(carlaCC, 80, "2026-10-01 10:00")) .           -- 0
+
+-- ============================================================
+-- Saques
+-- ============================================================
+
+-- (5) Bruno deposita R$ 100,00 e saca R$ 300,00 usando o limite
+--     saldo = (10000 - 200) - (30000 + 200) = -20400
+red getSaldo(sacar(depositar(brunoCC, 10000, "2026-10-02 08:00"),
+                   30000, "2026-10-02 12:00")) .                     -- -20400
+
+-- (6) Carla não tem limite: o saque acima do saldo é recusado
+red podeSacar?(depositar(carlaCC, 20000, "2026-10-03 09:00"), 25000) .   -- false
+red getSaldo(sacar(depositar(carlaCC, 20000, "2026-10-03 09:00"),
+                   25000, "2026-10-03 10:00")) .                     -- 19900
+
+-- (7) Poupança: não pode sacar mais do que o saldo
+red podeSacar?(depositar(daviPP, 100000, "2026-10-04 09:00"), 100001) .  -- false
+
+-- ============================================================
+-- Rendimento
+-- ============================================================
+
+-- (8) Davi aplica R$ 1.000,00 na poupança, que rende 0,7%
+red getSaldo(aplicarRendimento(depositar(daviPP, 100000, "2026-10-04 09:00"),
+                               "2026-11-01 00:00")) .                -- 100700
+
+-- (9) Rendimento sobre conta corrente não tem efeito
+red getSaldo(aplicarRendimento(depositar(anaCC, 50000, "2026-10-01 09:00"),
+                               "2026-11-01 00:00")) .                -- 49850
+
+-- ============================================================
+-- Sequências maiores de operações e o histórico (extrato)
+-- ============================================================
+
+-- (10) Poupança de Ana: depósito, rendimento, saque e novo rendimento
+red getSaldo(
+      aplicarRendimento(
+        sacar(
+          aplicarRendimento(depositar(anaPP, 200000, "2026-10-01 09:00"),
+                            "2026-11-01 00:00"),
+          50000, "2026-11-05 14:00"),
+        "2026-12-01 00:00")) .                                       -- 151755
+
+-- (11) O extrato da mesma sequência (transação mais recente primeiro)
+red getHistorico(
+      aplicarRendimento(
+        sacar(
+          aplicarRendimento(depositar(anaPP, 200000, "2026-10-01 09:00"),
+                            "2026-11-01 00:00"),
+          50000, "2026-11-05 14:00"),
+        "2026-12-01 00:00")) .
+
+-- (12) Operações recusadas não aparecem no extrato
+red getHistorico(sacar(depositar(carlaCC, 20000, "2026-10-03 09:00"),
+                       25000, "2026-10-03 10:00")) .
+
+-- (13) Depósitos sucessivos na poupança de Bruno (taxa de R$ 1,00 em cada)
+--      e o extrato resultante
+red getSaldo(depositar(depositar(brunoPP, 30000, "2026-10-01 09:00"),
+                       20000, "2026-10-15 09:00")) .                 -- 49800
+red getHistorico(depositar(depositar(brunoPP, 30000, "2026-10-01 09:00"),
+                           20000, "2026-10-15 09:00")) .
+
+-- ============================================================
+-- Validade (invariante) em estados concretos
+-- ============================================================
+
+-- (14) Bruno no limite: saldo negativo, mas ainda válido
+red valida?(sacar(depositar(brunoCC, 10000, "2026-10-02 08:00"),
+                  30000, "2026-10-02 12:00")) .                      -- true
+
+-- (15) Todas as seis contas recém-criadas são válidas
+red valida?(anaCC) and valida?(anaPP) and valida?(brunoCC)
+    and valida?(brunoPP) and valida?(carlaCC) and valida?(daviPP) .  -- true

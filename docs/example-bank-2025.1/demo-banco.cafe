@@ -1,0 +1,95 @@
+-- ============================================================
+-- demo-banco.cafe: Especificação BANCO em ação (somente reduções)
+--
+-- Valores em CENTAVOS; taxa de rendimento em PONTOS-BASE
+-- Execução: cafeobj -batch demo-banco.cafe
+-- ============================================================
+in banco.mod
+
+mod DEMO-BANCO {
+  protecting(BANCO)
+
+  -- Clientes
+  ops ana bruno carla davi : -> Cliente .
+  eq ana   = newCliente("Ana Souza",     "111.111.111-11", "ana@email.com") .
+  eq bruno = newCliente("Bruno Lima",    "222.222.222-22", "bruno@email.com") .
+  eq carla = newCliente("Carla Mendes",  "333.333.333-33", "carla@email.com") .
+  eq davi  = newCliente("Davi Oliveira", "444.444.444-44", "davi@email.com") .
+
+  -- Banco inicial: 6 contas abertas, todas com saldo zero
+  op banco0 : -> Banco .
+  eq banco0 =
+     abrirConta(abrirConta(abrirConta(abrirConta(abrirConta(abrirConta(nilB,
+       criarCorrente(1001, 1, ana,   100000, 150)),
+       criarPoupanca(1002, 1, ana,   0,      50)),
+       criarCorrente(2001, 1, bruno, 50000,  200)),
+       criarPoupanca(2002, 1, bruno, 100,    60)),
+       criarCorrente(3001, 2, carla, 0,      100)),
+       criarPoupanca(4001, 2, davi,  0,      70)) .
+
+  -- Banco após um mês de movimentação, na ordem:
+  --   1. Ana deposita R$ 3.000,00 na corrente (1001)
+  --   2. Ana deposita R$ 2.000,00 na poupança (1002)
+  --   3. Davi deposita R$ 1.000,00 na poupança (4001)
+  --   4. Bruno saca R$ 400,00 da corrente (2001), usando o limite
+  --   5. Ana transfere R$ 800,00 da corrente dela (1001) para a de Bruno (2001)
+  --   6. Rendimento das poupanças
+  -- (O CafeOBJ não aceita comentários no meio de um termo.)
+  op banco1 : -> Banco .
+  eq banco1 =
+     renderPoupancas(
+       transferir(
+         sacarDe(
+           depositarEm(depositarEm(depositarEm(banco0,
+             1001, 300000, "2026-10-01 09:00"),
+             1002, 200000, "2026-10-01 09:05"),
+             4001, 100000, "2026-10-02 10:00"),
+           2001, 40000, "2026-10-03 11:00"),
+         1001, 2001, 80000, "2026-10-10 15:00"),
+       "2026-11-01 00:00") .
+}
+
+select DEMO-BANCO .
+
+-- (1) Quantas contas o banco tem?
+red numContas(banco0) .                                      -- 6
+
+-- (2) Abrir uma conta com número repetido não altera o banco
+red numContas(abrirConta(banco0, criarCorrente(1001, 9, davi, 0, 0))) .   -- 6
+
+-- (3) Busca de conta existente e inexistente
+red getName(getTitular(buscar(banco0, 3001))) .              -- "Carla Mendes"
+red buscar(banco0, 9999) .                                   -- contaInexistente
+
+-- (4) Contas de um cliente (pelo CPF)
+red numContas(contasDe(banco0, "222.222.222-22")) .          -- 2
+
+-- (5) Saldos depois do mês de movimentação
+red getSaldo(buscar(banco1, 1001)) .   -- 300000 - 150 - (80000 + 150)    = 219700
+red getSaldo(buscar(banco1, 2001)) .   -- -(40000 + 200) + 80000          = 39800
+red getSaldo(buscar(banco1, 1002)) .   -- 200000 + 1000 (0,5%)            = 201000
+red getSaldo(buscar(banco1, 4001)) .   -- 100000 + 700  (0,7%)            = 100700
+
+-- (6) Saldo total do banco
+red saldoTotal(banco1) .                                     -- 561200
+
+-- (7) Extrato da corrente de Bruno: saque e transferência recebida
+red getHistorico(buscar(banco1, 2001)) .
+
+-- (8) Transferência recusada: Carla tem saldo zero e nenhum limite
+red podeTransferir?(banco1, 3001, 1001, 1000) .              -- false
+red saldoTotal(transferir(banco1, 3001, 1001, 1000, "x")) .  -- 561200 (inalterado)
+
+-- (9) Transferência para conta inexistente ou para si mesma
+red podeTransferir?(banco1, 1001, 9999, 1000) .              -- false
+red podeTransferir?(banco1, 1001, 1001, 1000) .              -- false
+
+-- (10) Operação sobre conta inexistente não altera o banco
+red saldoTotal(depositarEm(banco1, 9999, 50000, "x")) .      -- 561200
+
+-- (11) O banco permanece válido
+red valido?(banco0) .                                        -- true
+red valido?(banco1) .                                        -- true
+
+-- (12) Um banco montado à mão com números repetidos é inválido
+red valido?(criarCorrente(1, 1, ana, 0, 0) ; criarPoupanca(1, 1, bruno, 0, 0) ; nilB) .  -- false
