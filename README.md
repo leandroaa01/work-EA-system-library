@@ -40,4 +40,5 @@ python3 fuzz.py maude 2000
 - `docs/resumo-projeto.md`: project summary and design decisions (what to explain).
 - `docs/como-rodar.md`: how to run the code and read Maude's output.
 - `docs/apresentacao.md`: presentation guide (script, demo, likely questions).
+- `docs/slides/apresentacao-biblioteca.pptx`: presentation slides (with speaker notes).
 - `docs/execucao/`: real execution logs and the module signature.

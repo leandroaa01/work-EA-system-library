@@ -2,6 +2,25 @@
 
 > O enunciado do trabalho **não define** formato, duração ou obrigatoriedade de slides. Este roteiro é uma sugestão (~12 a 15 minutos). Confirme com o professor o tempo e se há perguntas ao final.
 
+## Slides prontos
+
+`docs/slides/apresentacao-biblioteca.pptx`: 17 slides mais 1 de backup (mecanismos do Maude), 16:9, editável no PowerPoint e no Google Slides. **Cada slide tem notas do apresentador** com o que falar (veja em *Exibir → Notas*). Os slides seguem o roteiro da seção 2 abaixo:
+
+| Slides | Roteiro |
+|---|---|
+| 1–2 | Introdução (etapa 1) |
+| 3 | Abstração (etapa 2) |
+| 4 | Regras (etapa 5) |
+| 5–6 | Assinatura (etapa 3) |
+| 7–9 | Estruturas algébricas e equações (etapas 4 e 5) |
+| 10–11 | Guardas e situações inválidas (etapa 5) |
+| 12–13 | Demonstração e reescrita passo a passo (etapa 6) |
+| 14 | Propriedades (etapa 7) |
+| 15–17 | Verificação, análise e conclusão (etapa 8) |
+| 18 | Backup para perguntas |
+
+A fonte usada é Calibri. Se faltar na máquina da apresentação, o PowerPoint troca por outra e o texto pode quebrar diferente; abra os slides lá antes.
+
 ## 1. O que levar pronto
 
 | Item | Para quê |
