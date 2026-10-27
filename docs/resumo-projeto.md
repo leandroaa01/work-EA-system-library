@@ -23,7 +23,7 @@ Especificar (não implementar) um sistema, seguindo a cadeia *descrição inform
 | 7 | Mesmo assim existe **erro explícito**: `buscar` → `livroInexistente`, e `diagX` → `err…` | permite dizer *qual* regra falhou | só estado inalterado |
 | 8 | Guardas separadas (`podeEmprestar?`…) | pré-condições nomeadas, testáveis sozinhas | condições soltas dentro das equações |
 | 9 | Invariantes como predicados (`idsUnicos?`, `contagemOk?`, `invariante?`) | permitem testar R6/R7 até em estados montados à mão | confiar que as operações preservam |
-| 10 | Base **equacional** (`fmod`, sem `rl`) | o enunciado pede equações; não há dinâmica a modelar | regras de reescrita `rl` |
+| 10 | Base **equacional** (`fmod`); `rl` só em `verificacao.maude` | o enunciado pede equações; as regras `rl` servem apenas para o `search` explorar estados | modelar tudo com `rl` |
 | 11 | Módulos em camadas com `protecting` | imita `CLIENTE`/`CONTA` → `BANCO` | um módulo único |
 
 ## 4. Regras do enunciado e extras
@@ -114,7 +114,8 @@ eq contagemOk?(B) = (qtdDisponiveis(B) + qtdEmprestados(B)) == totalLivros(B) .
 | `assoc` / `id:` | associatividade / elemento neutro (juntos: monóide) |
 | `if_then_else_fi` | escolhe o ramo conforme a guarda reduz a `true` ou `false` |
 | `==` / `=/=` | igualdade entre formas normais |
-| `ceq`, `[owise]`, `rl` | **não usados**: `ceq` seria equação condicional; `owise`, "se nenhuma outra equação casar"; `rl`, regra de reescrita não equacional |
+| `ceq`, `[owise]` | **não usados**: `ceq` seria equação condicional; `owise`, "se nenhuma outra equação casar" |
+| `rl`, `search` | só em `verificacao.maude`: `rl` é regra de reescrita não equacional, `search` percorre os estados alcançáveis |
 
 ## 6. As 10 situações inválidas
 
@@ -137,10 +138,10 @@ Em todas, o teste é do tipo `operação(...) == estado`, e dá `true` (estado i
 
 | O quê | Como | Resultado |
 |---|---|---|
-| 75 testes da demo | `verificar.py` compara cada `result` com o `*** esperado:` | 0 divergências |
+| 75 testes da demo | módulo `CONFERENCIA` (em Maude): cada teste vira uma equação `tN` que compara com o esperado | 6 seções e `todos?` dão `true` |
 | Reescrita passo a passo | `set trace on` (3 exemplos, inclusive "Cthulhu") | 20 reescritas até `2` |
-| Propriedades em estados aleatórios | `fuzz.py`: 2000 históricos, 4 checagens por estado | 0 falhas |
-| Sensibilidade do teste aleatório | removida a guarda de limite (E4) numa cópia | 10 falhas detectadas |
+| Todos os estados alcançáveis (4 livros, 2 usuários) | `verificacao.maude`: `search` com 28 regras `rl` | 6613 estados, invariante e coerência sem violação |
+| Sensibilidade da verificação | 7 defeitos injetados numa cópia (sem R2, R4, R5, R6, E2, E3, E4) | os 7 foram detectados |
 
 Todas as saídas são **reais** (Maude 3.5.1). Os logs estão em `docs/execucao/`.
 
@@ -162,7 +163,8 @@ Datas, prazos, multas, reservas, renovação, múltiplos exemplares por título 
 
 ## 10. Limitações a admitir se perguntarem
 
-- A **suficiente completude** (todo termo fechado reduz a construtores) foi verificada empiricamente (2000 históricos), não com a ferramenta SCC do Maude.
+- A **suficiente completude** (todo termo fechado reduz a construtores) não foi checada com a ferramenta SCC do Maude. Só há evidência indireta: nos 6613 estados da `verificacao.maude`, `invariante?(B) =/= true` não tem solução, então nenhum termo travou sem reduzir.
+- A verificação exaustiva só cobre 4 livros e 2 usuários (limite do espaço de estados). Para tamanho arbitrário valem as provas em papel.
 - O limite de 3 empréstimos é arbitrário.
 - As provas P1–P5 são em papel, não mecanizadas.
 - O Maude reordena operandos comutativos de `Nat` ao imprimir (`1 + total(...)`); é só exibição.
@@ -171,7 +173,7 @@ Datas, prazos, multas, reservas, renovação, múltiplos exemplares por título 
 
 - Uma linha `*** (` abre **comentário de bloco** no Maude, mesmo com espaço, e quebra o parse. Por isso os testes usam `*** [n]`.
 - A comparação `== lib` é entre **formas normais**: só funciona porque o sistema é terminante e confluente.
-- Um teste aleatório que nunca falha não prova nada: validamos o `fuzz.py` quebrando o código de propósito (mutação) e vendo o teste acusar.
+- Uma busca que dá `No solution` pode estar vazia por engano. Por isso a `verificacao.maude` inclui buscas que **têm** que achar solução (V3 a V7), e validamos tudo quebrando o código de propósito: cada um dos 7 defeitos injetados foi detectado.
 
 ## 12. Glossário rápido
 

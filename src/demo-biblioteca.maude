@@ -374,6 +374,113 @@ reduce usuariosUnicos?(ruim3) .
 *** esperado: true
 reduce contagemOk?(ruim1) and contagemOk?(ruim2) .
 
+*** Conferência automática: cada tN repete o teste [N] comparando com o valor esperado.
+*** Se algum der false, reduza só aquele (ex.: reduce t17 .) para achar o problema.
+
+fmod CONFERENCIA is
+  protecting DEMO-BIBLIOTECA .
+
+  ops t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25 t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51 t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 : -> Bool .
+
+  eq t1 = totalLivros(lib0) == 5 .
+  eq t2 = totalUsuarios(lib0) == 4 .
+  eq t3 = pertence?(lib0, l1) .
+  eq t4 = pertence?(lib0, l6) == false .
+  eq t5 = disponivel?(lib0, l1) .
+  eq t6 = qtdEmprestados(lib0) == 0 .
+  eq t7 = qtdDisponiveis(lib0) == 5 .
+  eq t8 = totalLivros(lib1) == 6 .
+  eq t9 = qtdEmprestados(lib1) == 4 .
+  eq t10 = qtdDisponiveis(lib1) == 2 .
+  eq t11 = possui?(lib1, ana, l1) .
+  eq t12 = possui?(lib1, bruno, l3) == false .
+  eq t13 = possui?(lib1, carla, l3) .
+  eq t14 = disponivel?(lib1, l1) == false .
+  eq t15 = disponivel?(lib1, l6) .
+  eq t16 = totalLivros(bibliotecaVazia) == 0 .
+  eq t17 = pertence?(bibliotecaVazia, l1) == false .
+  eq t18 = buscar(lib0, l7) == livroInexistente .
+  eq t19 = buscar(lib1, l6) == item(livro(6), "O chamado de Cthulhu", disponivel) .
+  eq t20 = livrosDe(lib1, ana) == (item(livro(1), "Dom Casmurro", emprestado(usuario(1))) ; item(livro(2), "Memorias Postumas", emprestado(usuario(1))) ; item(livro(4), "Vidas Secas", emprestado(usuario(1)))) .
+  eq t21 = qtdDe(lib1, ana) == 3 .
+  eq t22 = livrosDe(lib1, davi) == nilA .
+  eq t23 = (totalLivros(addLivro(lib0, l6, "O chamado de Cthulhu"))) == 6 .
+  eq t24 = totalLivros(addLivro(lib0, l6, "O chamado de Cthulhu")) == totalLivros(lib0) + 1 .
+  eq t25 = totalLivros(addLivro(bibliotecaVazia, l6, "O chamado de Cthulhu")) == totalLivros(bibliotecaVazia) + 1 .
+  eq t26 = totalLivros(addLivro(lib1, l7, "Novo titulo")) == totalLivros(lib1) + 1 .
+  eq t27 = (totalLivros(removerLivro(devolver(emprestar(lib0, l5, davi), l5, davi), l5))) == 4 .
+  eq t28 = (pertence?(removerLivro(devolver(emprestar(lib0, l5, davi), l5, davi), l5), l5)) == false .
+  eq t29 = (disponivel?(emprestar(lib0, l1, ana), l1)) == false .
+  eq t30 = disponivel?(devolver(emprestar(lib0, l1, ana), l1, ana), l1) .
+  eq t31 = devolver(emprestar(lib0, l1, ana), l1, ana) == lib0 .
+  eq t32 = totalLivros(removerLivro(lib0, l1)) + 1 == totalLivros(lib0) .
+  eq t33 = removerLivro(pequena, l1) == biblioteca(nilA, ana) .
+  eq t34 = (totalLivros(removerLivro(lib0, l1)) == 4) and (totalLivros(removerLivro(lib0, l3)) == 4) and (totalLivros(removerLivro(lib0, l5)) == 4) .
+  eq t35 = (totalUsuarios(registrarUsuario(lib0, usuario(5))) == 5) and (removerUsuario(registrarUsuario(lib0, usuario(5)), usuario(5)) == lib0) .
+  eq t36 = emprestar(lib0, l7, ana) == lib0 .
+  eq t37 = emprestar(lib1, l1, bruno) == lib1 .
+  eq t38 = emprestar(lib1, l1, ana) == lib1 .
+  eq t39 = devolver(lib0, l1, ana) == lib0 .
+  eq t40 = devolver(lib1, l1, bruno) == lib1 .
+  eq t41 = removerLivro(lib1, l1) == lib1 .
+  eq t42 = removerLivro(lib0, l7) == lib0 .
+  eq t43 = addLivro(lib0, l1, "Outro titulo") == lib0 .
+  eq t44 = (totalLivros(addLivro(lib0, l1, "Outro titulo"))) == 5 .
+  eq t45 = registrarUsuario(lib0, ana) == lib0 .
+  eq t46 = emprestar(lib0, l1, fantasma) == lib0 .
+  eq t47 = removerUsuario(lib1, ana) == lib1 .
+  eq t48 = removerUsuario(lib0, fantasma) == lib0 .
+  eq t49 = emprestar(lib1, l5, ana) == lib1 .
+  eq t50 = emprestar(bibliotecaVazia, l1, ana) == bibliotecaVazia .
+  eq t51 = (qtdEmprestados(emprestar(lib1, l5, bruno))) == 5 .
+  eq t52 = podeEmprestar?(lib1, l5, ana) == false .
+  eq t53 = podeEmprestar?(lib1, l5, bruno) .
+  eq t54 = diagEmprestar(lib0, l7, ana) == errLivroInexistente .
+  eq t55 = diagEmprestar(lib1, l1, bruno) == errLivroJaEmprestado .
+  eq t56 = diagEmprestar(lib0, l1, fantasma) == errUsuarioInexistente .
+  eq t57 = diagEmprestar(lib1, l5, ana) == errLimiteExcedido .
+  eq t58 = diagEmprestar(lib1, l5, bruno) == ok .
+  eq t59 = diagDevolver(lib1, l1, bruno) == errNaoEmprestadoAoUsuario .
+  eq t60 = diagRemoverLivro(lib1, l1) == errLivroEmprestado .
+  eq t61 = diagAddLivro(lib0, l1) == errIdRepetido .
+  eq t62 = diagRegistrar(lib0, ana) == errUsuarioRepetido .
+  eq t63 = diagRemoverUsuario(lib1, ana) == errUsuarioComLivros .
+  eq t64 = (podeDevolver?(lib1, l1, ana) == (diagDevolver(lib1, l1, ana) == ok)) and (podeDevolver?(lib1, l1, bruno) == (diagDevolver(lib1, l1, bruno) == ok)) .
+  eq t65 = qtdDisponiveis(lib0) + qtdEmprestados(lib0) == totalLivros(lib0) .
+  eq t66 = qtdDisponiveis(lib1) + qtdEmprestados(lib1) == totalLivros(lib1) .
+  eq t67 = contagemOk?(h1) and contagemOk?(h2) and contagemOk?(h3) and contagemOk?(h4) and contagemOk?(h5) and contagemOk?(h6) and contagemOk?(h7) .
+  eq t68 = contagemOk?(emprestar(lib1, l1, bruno)) and contagemOk?(removerLivro(lib1, l1)) and contagemOk?(removerLivro(lib0, l3)) and contagemOk?(devolver(lib1, l1, ana)) and contagemOk?(addLivro(lib1, l1, "x")) .
+  eq t69 = invariante?(lib0) and invariante?(h1) and invariante?(h2) and invariante?(h4) and invariante?(h6) and invariante?(lib1) .
+  eq t70 = invariante?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l7, "Novo")) and idsUnicos?(addLivro(lib1, l1, "Repetido")) and invariante?(removerUsuario(lib1, davi)) and invariante?(emprestar(lib1, l5, ana)) .
+  eq t71 = idsUnicos?(ruim1) == false .
+  eq t72 = invariante?(ruim1) == false .
+  eq t73 = donosRegistrados?(ruim2) == false .
+  eq t74 = usuariosUnicos?(ruim3) == false .
+  eq t75 = contagemOk?(ruim1) and contagemOk?(ruim2) .
+
+  ops secaoA? secaoC? secaoD? secaoE? secaoF? secaoG? todos? : -> Bool .
+  eq secaoA? = t1 and t2 and t3 and t4 and t5 and t6 and t7 and t8 and t9 and t10 and t11 and t12 and t13 and t14 and t15 and t16 and t17 and t18 and t19 and t20 and t21 and t22 .
+  eq secaoC? = t23 and t24 and t25 and t26 .
+  eq secaoD? = t27 and t28 and t29 and t30 and t31 and t32 and t33 and t34 and t35 .
+  eq secaoE? = t36 and t37 and t38 and t39 and t40 and t41 and t42 and t43 and t44 and t45 and t46 and t47 and t48 and t49 and t50 .
+  eq secaoF? = t51 and t52 and t53 and t54 and t55 and t56 and t57 and t58 and t59 and t60 and t61 and t62 and t63 and t64 .
+  eq secaoG? = t65 and t66 and t67 and t68 and t69 and t70 and t71 and t72 and t73 and t74 and t75 .
+  eq todos? = secaoA? and secaoC? and secaoD? and secaoE? and secaoF? and secaoG? .
+endfm
+
+select CONFERENCIA .
+
+*** esperado: true (as seções A a G, uma por vez, e depois todas juntas)
+reduce secaoA? .
+reduce secaoC? .
+reduce secaoD? .
+reduce secaoE? .
+reduce secaoF? .
+reduce secaoG? .
+reduce todos? .
+
+select DEMO-BIBLIOTECA .
+
 *** H. Reescrita passo a passo (set trace)
 *** TRACE-BEGIN
 

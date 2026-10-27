@@ -1,9 +1,60 @@
-75 testes conferidos, 0 divergencia(s)
-2000 historicos; checagens: {'F1': 2000, 'F2': 2000, 'F3': 12000, 'F4': 12000}; falhas: 0
-cobertura das guardas (valido/invalido):
-  AddLivro          559 /  1441
-  RemoverLivro     1189 /   811
-  Registrar         750 /  1250
-  RemoverUsuario    804 /  1196
-  Emprestar         715 /  1285
-  Devolver           69 /  1931
+==========================================
+search in DINAMICA : bibliotecaVazia =>* B such that invariante?(B) =/= true =
+    true .
+
+No solution.
+states: 6613  rewrites: 9161861 in 405ms cpu (408ms real) (22609876
+    rewrites/second)
+==========================================
+search in DINAMICA : bibliotecaVazia =>* B such that coerente?(B) =/= true =
+    true .
+
+No solution.
+states: 6613  rewrites: 81205087 in 2458ms cpu (2462ms real) (33024347
+    rewrites/second)
+==========================================
+search [1] in DINAMICA : bibliotecaVazia =>* B such that qtdDe(B, usuario(1))
+    == 3 = true .
+
+Solution 1 (state 1421)
+states: 1422  rewrites: 632229 in 24ms cpu (24ms real) (25626403
+    rewrites/second)
+B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
+    "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
+    1))), usuario(1))
+==========================================
+search [1] in DINAMICA : bibliotecaVazia =>* B such that diagEmprestar(B,
+    livro(4), usuario(1)) == errLimiteExcedido = true .
+
+Solution 1 (state 2701)
+states: 2702  rewrites: 1615993 in 60ms cpu (62ms real) (26884376
+    rewrites/second)
+B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
+    "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
+    1))) ; item(livro(4), "t4", disponivel), usuario(1))
+==========================================
+search [1] in DINAMICA : bibliotecaVazia =>* B such that diagEmprestar(B,
+    livro(1), usuario(2)) == errLivroJaEmprestado = true .
+
+Solution 1 (state 44)
+states: 45  rewrites: 7110 in 0ms cpu (0ms real) (34019138 rewrites/second)
+B --> biblioteca(item(livro(1), "t1", emprestado(usuario(2))), usuario(2))
+==========================================
+search [1] in DINAMICA : bibliotecaVazia =>* B such that diagRemoverUsuario(B,
+    usuario(1)) == errUsuarioComLivros = true .
+
+Solution 1 (state 42)
+states: 43  rewrites: 6139 in 0ms cpu (0ms real) (~ rewrites/second)
+B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))), usuario(1))
+==========================================
+search [1] in DINAMICA : bibliotecaVazia =>* B such that qtdEmprestados(B) == 4
+    = true .
+
+Solution 1 (state 5941)
+states: 5942  rewrites: 5319166 in 215ms cpu (215ms real) (24721105
+    rewrites/second)
+B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
+    "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
+    1))) ; item(livro(4), "t4", emprestado(usuario(2))), usuario(1) & usuario(
+    2))
+Bye.

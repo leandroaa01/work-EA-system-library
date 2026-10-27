@@ -24,18 +24,19 @@ cd src
 maude -no-banner demo-biblioteca.maude < /dev/null
 ```
 
-4. (Optional) Check every `result` against the `*** esperado:` comments and run the randomized property test:
+   The last block of `reduce` commands of the test section (module `CONFERENCIA`) compares every test with its expected value and must print `true`.
+
+4. (Optional) Run the exhaustive check of the invariant (everything in Maude, no extra tools):
 
 ```bash
-maude -no-banner demo-biblioteca.maude < /dev/null > ../docs/execucao/log-demo.txt
-python3 verificar.py demo-biblioteca.maude ../docs/execucao/log-demo.txt
-python3 fuzz.py maude 2000
+maude -no-banner verificacao.maude < /dev/null
 ```
 
 ## Layout
 
 - `src/biblioteca.maude`: layered modules `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO`.
-- `src/demo-biblioteca.maude`: `DEMO-BIBLIOTECA` with 75 numbered tests and 3 step-by-step traces.
+- `src/demo-biblioteca.maude`: `DEMO-BIBLIOTECA` with 75 numbered tests, the automatic check `CONFERENCIA` and 3 step-by-step traces.
+- `src/verificacao.maude`: exhaustive check with `search` over all states reachable with 4 books and 2 users.
 - `docs/relatorio.md`: the report (in Portuguese).
 - `docs/resumo-projeto.md`: project summary and design decisions (what to explain).
 - `docs/como-rodar.md`: how to run the code and read Maude's output.

@@ -57,6 +57,8 @@ Rode `maude -no-banner demo-biblioteca.maude < /dev/null` (ou carregue no intera
 4. **Erro explícito** [55]: `diagEmprestar(lib1, l1, bruno)` dá `errLivroJaEmprestado`.
 5. **Invariante em estado inválido** [71]: `idsUnicos?(ruim1)` dá `false`.
 
+Depois dos testes, mostre as sete linhas `result Bool: true` do módulo `CONFERENCIA` (o Maude conferindo os 75 testes sozinho). Se houver tempo, rode `maude -no-banner verificacao.maude < /dev/null`: são 6613 estados e `No solution.` nas duas primeiras buscas (o invariante nunca é violado).
+
 Se sobrar tempo, mostre o **trace** (reescrita passo a passo) do exemplo "Cthulhu": no interativo, `set trace on .` e depois o `reduce` de [T1]. No final do `demo-biblioteca.maude` há três exemplos prontos.
 
 **Dica:** o `lib1` é a "história" (Ana pega 3 livros, Bruno pega e devolve, Carla pega o l3). Conte essa história antes de mostrar os testes inválidos; fica fácil de acompanhar.
@@ -70,10 +72,10 @@ Se sobrar tempo, mostre o **trace** (reescrita passo a passo) do exemplo "Cthulh
 | Qual a diferença entre construtor e operador definido? | Construtores (`[ctor]`) geram os valores; definidos têm equações que os reduzem a construtores. |
 | Como operações inválidas são tratadas? | Guarda `if podeX? then … else B fi`: estado inalterado. Além disso, `diagX` informa qual erro ocorreu. |
 | Como R7 é garantida? | Provada por indução para **todo** estado: cada item é `disponivel` ou `emprestado(U)`, então os dois contadores somam o total. |
-| Por que não usou `rl`? | A base é equacional; não há dinâmica não determinística a modelar. |
+| Por que não usou `rl`? | A especificação é equacional (`fmod`). Só no arquivo separado `verificacao.maude` usamos `rl`, para o `search` percorrer todos os estados alcançáveis e conferir o invariante. |
 | Por que `ceq`/`owise` não aparecem? | Usei `if_then_else_fi` como no exemplo do professor; os padrões das equações são disjuntos, então `owise` não foi necessário. |
-| Como sabem que o código funciona? | 75 testes com resultado esperado conferido por script (0 divergências) e 2000 históricos aleatórios (guarda ⇔ diagnóstico ⇔ estado muda). |
-| Isso prova que está correto? | As propriedades foram provadas em papel por indução; os testes validam instâncias. A suficiente completude foi verificada só empiricamente, não com a ferramenta SCC. |
+| Como sabem que o código funciona? | 75 testes com resultado esperado conferido dentro do próprio Maude (módulo `CONFERENCIA`, tudo `true`) e `search` sobre os 6613 estados alcançáveis com 4 livros e 2 usuários, sem violação do invariante. |
+| Isso prova que está correto? | As propriedades foram provadas em papel por indução; os testes validam instâncias. A suficiente completude não foi checada com a ferramenta SCC. |
 | O que não foi modelado? | Datas, multas, reservas, renovação, múltiplos exemplares por título, concorrência (`relatorio.md` §10.3). |
 | Por que limite de 3 empréstimos? | Regra extra E4 para mostrar uma regra numérica; o valor é arbitrário e fica em `limiteEmprestimos`. |
 
@@ -96,4 +98,4 @@ Cada pessoa precisa saber explicar **o projeto inteiro em alto nível** e uma pa
 - [ ] Todos conseguem explicar o monóide e o papel de `Status`.
 - [ ] Combinar quem faz a demonstração ao vivo.
 - [ ] Confirmar o tamanho do grupo (o enunciado permite **até 4**; o `README.md` lista 5 autores).
-- [ ] Enviar o trabalho por e-mail até **30 de outubro** para valdigleis@dimap.ufrn.br (relatório, `biblioteca.maude`, `demo-biblioteca.maude`, exemplos de execução).
+- [ ] Enviar o trabalho por e-mail até **30 de outubro** para valdigleis@dimap.ufrn.br (relatório, `biblioteca.maude`, `demo-biblioteca.maude`, `verificacao.maude`, exemplos de execução).

@@ -41,27 +41,46 @@ reduce totalLivros(addLivro(bibliotecaVazia, livro(1), "Dom Casmurro")) .
 
 Para usar as constantes da demo (`lib0`, `lib1`, `ana`, `l1`…), carregue a demo (`load demo-biblioteca.maude .`) e depois `reduce qtdEmprestados(lib1) .`.
 
-## 3. Conferência automática
+## 3. Conferência automática (tudo em Maude)
+
+No fim dos testes da demo existe o módulo `CONFERENCIA`. Cada teste `[n]` é repetido como uma equação `tn` que compara o resultado com o valor esperado, e as seções A a G são agrupadas. As últimas linhas da seção de testes são:
+
+```maude
+reduce secaoA? .
+...
+reduce secaoG? .
+reduce todos? .
+```
+
+Saída esperada: **sete** `result Bool: true` (seis seções e `todos?`).
+
+```
+reduce in CONFERENCIA : todos? .
+rewrites: 50615 in 0ms cpu (1ms real) (77039573 rewrites/second)
+result Bool: true
+```
+
+Se alguma seção der `false`, reduza os testes dela um a um (`reduce t17 .`) até achar qual divergiu. Os números `tN` são os mesmos de `*** [N]` na demo.
+
+**Verificação exaustiva (opcional):**
 
 ```bash
-python3 verificar.py demo-biblioteca.maude ../docs/execucao/log-demo.txt
+maude -no-banner verificacao.maude < /dev/null
 ```
 
-Compara cada `result` com o comentário `*** esperado:` antes do `reduce`. Saída esperada:
+O arquivo `verificacao.maude` define regras de reescrita (`rl`) que aplicam cada operação a qualquer estado e usa `search` para percorrer **todos** os estados alcançáveis com até 4 livros e 2 usuários. A saída esperada é:
 
 ```
-75 testes conferidos, 0 divergencia(s)
+No solution.
+states: 6613  rewrites: 9161861 ...
+No solution.
+states: 6613  rewrites: 81205087 ...
+Solution 1 (state 1421) ...
 ```
 
-Se houver divergência, aparece `DIVERGENCIA [n]: esperado=… obtido=…` com o número do teste.
-
-**Teste aleatório (opcional):**
-
-```bash
-python3 fuzz.py maude 2000
-```
-
-Gera 2000 históricos aleatórios e confere o invariante, a forma normal e a coerência entre guarda, diagnóstico e mudança de estado. Saída esperada: `falhas: 0`. Os dois scripts precisam de Python 3 e não usam bibliotecas extras.
+- As duas primeiras buscas procuram **contraexemplos** (estado que viola o invariante; estado em que guarda, diagnóstico e efeito discordam). `No solution.` significa que não existe nenhum nos 6613 estados.
+- As cinco seguintes procuram estados **interessantes** (usuário no limite de 3 livros, empréstimo recusado por E4, etc.) e têm que achar `Solution 1`. Elas mostram que a primeira busca não está vazia por acaso.
+- Usamos `rl` só nesse arquivo, para explorar estados. A especificação em si (`biblioteca.maude`) continua só com equações.
 
 ## 4. Como ler a saída do Maude
 
@@ -142,6 +161,7 @@ Para desligar: `set trace off .`.
 | Especificação (sorts, operadores, equações) | `src/biblioteca.maude` |
 | Testes e termos de exemplo | `src/demo-biblioteca.maude` |
 | Saída real de uma execução | `docs/execucao/log-demo.txt` |
-| Resultado do verificador e do teste aleatório | `docs/execucao/log-verificacao.txt` |
+| Resultado da verificação exaustiva (`search`) | `docs/execucao/log-verificacao.txt` |
+| Verificação exaustiva | `src/verificacao.maude` |
 | Sorts e operadores como o Maude os enxerga | `docs/execucao/assinatura.txt` |
 | Explicação formal completa | `docs/relatorio.md` |

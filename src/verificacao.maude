@@ -1,0 +1,146 @@
+*** Verificação por busca exaustiva (model checking com search).
+*** Parte de bibliotecaVazia e explora TODOS os estados alcançáveis num
+*** universo pequeno (livros 1 a 4, usuários 1 e 2). Em cada estado confere
+*** o invariante e a coerência entre guarda, diagnóstico e mudança de estado.
+*** Execução: maude -no-banner verificacao.maude < /dev/null
+
+load biblioteca.maude
+
+*** para cada operação: a guarda concorda com o diagnóstico e com o efeito
+*** (guarda verdadeira: o estado muda; guarda falsa: o estado fica igual)
+fmod COERENCIA is
+  protecting DIAGNOSTICO .
+
+  op addOk? : Biblioteca IdLivro -> Bool .
+  op removerLivroOk? : Biblioteca IdLivro -> Bool .
+  op registrarOk? : Biblioteca IdUsuario -> Bool .
+  op removerUsuarioOk? : Biblioteca IdUsuario -> Bool .
+  op emprestarOk? : Biblioteca IdLivro IdUsuario -> Bool .
+  op devolverOk? : Biblioteca IdLivro IdUsuario -> Bool .
+  op todosOk? : Biblioteca IdLivro IdUsuario -> Bool .
+  op linha? : Biblioteca Nat Nat -> Bool .
+  op varre? : Biblioteca Nat Nat -> Bool .
+  op coerente? : Biblioteca -> Bool .
+
+  var B : Biblioteca .
+  var L : IdLivro .
+  var U : IdUsuario .
+  vars N M : Nat .
+
+  eq addOk?(B, L) =
+    (podeAddLivro?(B, L) == (diagAddLivro(B, L) == ok))
+    and (podeAddLivro?(B, L) == (addLivro(B, L, "x") =/= B)) .
+
+  eq removerLivroOk?(B, L) =
+    (podeRemoverLivro?(B, L) == (diagRemoverLivro(B, L) == ok))
+    and (podeRemoverLivro?(B, L) == (removerLivro(B, L) =/= B)) .
+
+  eq registrarOk?(B, U) =
+    (podeRegistrar?(B, U) == (diagRegistrar(B, U) == ok))
+    and (podeRegistrar?(B, U) == (registrarUsuario(B, U) =/= B)) .
+
+  eq removerUsuarioOk?(B, U) =
+    (podeRemoverUsuario?(B, U) == (diagRemoverUsuario(B, U) == ok))
+    and (podeRemoverUsuario?(B, U) == (removerUsuario(B, U) =/= B)) .
+
+  *** P2: se o empréstimo era permitido, devolver desfaz emprestar
+  eq emprestarOk?(B, L, U) =
+    (podeEmprestar?(B, L, U) == (diagEmprestar(B, L, U) == ok))
+    and (podeEmprestar?(B, L, U) == (emprestar(B, L, U) =/= B))
+    and (not podeEmprestar?(B, L, U) or devolver(emprestar(B, L, U), L, U) == B) .
+
+  *** R3: se a devolução era permitida, o livro fica disponível
+  eq devolverOk?(B, L, U) =
+    (podeDevolver?(B, L, U) == (diagDevolver(B, L, U) == ok))
+    and (podeDevolver?(B, L, U) == (devolver(B, L, U) =/= B))
+    and (not podeDevolver?(B, L, U) or disponivel?(devolver(B, L, U), L)) .
+
+  eq todosOk?(B, L, U) =
+    addOk?(B, L) and removerLivroOk?(B, L) and registrarOk?(B, U)
+    and removerUsuarioOk?(B, U) and emprestarOk?(B, L, U) and devolverOk?(B, L, U) .
+
+  *** confere todos os pares (livro N, usuário M) com N de 1 a 5 e M de 1 a 3
+  *** (livro 5 e usuário 3 nunca existem: cobrem os casos de elemento inexistente)
+  eq linha?(B, N, 0) = true .
+  eq linha?(B, N, s M) = todosOk?(B, livro(N), usuario(s M)) and linha?(B, N, M) .
+
+  eq varre?(B, 0, M) = true .
+  eq varre?(B, s N, M) = linha?(B, s N, M) and varre?(B, N, M) .
+
+  eq coerente?(B) = varre?(B, 5, 3) .
+endfm
+
+*** Cada regra aplica uma operação a qualquer estado. Operações inválidas
+*** deixam o estado igual (laço), então a busca só avança nas válidas.
+*** Uso de rl: aqui as regras modelam a dinâmica (as operações possíveis);
+*** a especificação em si continua só com equações.
+mod DINAMICA is
+  protecting COERENCIA .
+
+  var B : Biblioteca .
+
+  rl [add1] : B => addLivro(B, livro(1), "t1") .
+  rl [add2] : B => addLivro(B, livro(2), "t2") .
+  rl [add3] : B => addLivro(B, livro(3), "t3") .
+  rl [add4] : B => addLivro(B, livro(4), "t4") .
+
+  rl [rem1] : B => removerLivro(B, livro(1)) .
+  rl [rem2] : B => removerLivro(B, livro(2)) .
+  rl [rem3] : B => removerLivro(B, livro(3)) .
+  rl [rem4] : B => removerLivro(B, livro(4)) .
+
+  rl [reg1] : B => registrarUsuario(B, usuario(1)) .
+  rl [reg2] : B => registrarUsuario(B, usuario(2)) .
+  rl [remu1] : B => removerUsuario(B, usuario(1)) .
+  rl [remu2] : B => removerUsuario(B, usuario(2)) .
+
+  rl [emp11] : B => emprestar(B, livro(1), usuario(1)) .
+  rl [emp21] : B => emprestar(B, livro(2), usuario(1)) .
+  rl [emp31] : B => emprestar(B, livro(3), usuario(1)) .
+  rl [emp41] : B => emprestar(B, livro(4), usuario(1)) .
+  rl [emp12] : B => emprestar(B, livro(1), usuario(2)) .
+  rl [emp22] : B => emprestar(B, livro(2), usuario(2)) .
+  rl [emp32] : B => emprestar(B, livro(3), usuario(2)) .
+  rl [emp42] : B => emprestar(B, livro(4), usuario(2)) .
+
+  rl [dev11] : B => devolver(B, livro(1), usuario(1)) .
+  rl [dev21] : B => devolver(B, livro(2), usuario(1)) .
+  rl [dev31] : B => devolver(B, livro(3), usuario(1)) .
+  rl [dev41] : B => devolver(B, livro(4), usuario(1)) .
+  rl [dev12] : B => devolver(B, livro(1), usuario(2)) .
+  rl [dev22] : B => devolver(B, livro(2), usuario(2)) .
+  rl [dev32] : B => devolver(B, livro(3), usuario(2)) .
+  rl [dev42] : B => devolver(B, livro(4), usuario(2)) .
+endm
+
+*** [V1] Em todo estado alcançável o invariante vale (R6, R7, E1, E3).
+*** Usamos =/= true (e não == false) para pegar também termos que não
+*** reduzem a construtores.
+*** esperado: No solution
+search bibliotecaVazia =>* B:Biblioteca such that invariante?(B) =/= true .
+
+*** [V2] Em nenhum estado alcançável guarda, diagnóstico e efeito discordam;
+*** também vale P2 (devolver desfaz emprestar) e R3
+*** esperado: No solution
+search bibliotecaVazia =>* B:Biblioteca such that coerente?(B) =/= true .
+
+*** A busca não é vazia: os estados interessantes são alcançáveis.
+*** [V3] Usuário 1 com 3 livros emprestados (o limite)
+*** esperado: Solution 1
+search [1] bibliotecaVazia =>* B:Biblioteca such that qtdDe(B, usuario(1)) == 3 .
+
+*** [V4] Estado em que a regra E4 recusa um empréstimo
+*** esperado: Solution 1
+search [1] bibliotecaVazia =>* B:Biblioteca such that diagEmprestar(B, livro(4), usuario(1)) == errLimiteExcedido .
+
+*** [V5] Estado em que o empréstimo é recusado porque o livro já está emprestado (R2)
+*** esperado: Solution 1
+search [1] bibliotecaVazia =>* B:Biblioteca such that diagEmprestar(B, livro(1), usuario(2)) == errLivroJaEmprestado .
+
+*** [V6] Estado em que não se pode remover o usuário por ter livros (E2)
+*** esperado: Solution 1
+search [1] bibliotecaVazia =>* B:Biblioteca such that diagRemoverUsuario(B, usuario(1)) == errUsuarioComLivros .
+
+*** [V7] Estado com os 4 livros emprestados (acervo cheio)
+*** esperado: Solution 1
+search [1] bibliotecaVazia =>* B:Biblioteca such that qtdEmprestados(B) == 4 .

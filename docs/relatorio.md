@@ -3,7 +3,7 @@
 **Disciplina:** Estruturas Algébricas — Uso das Estruturas Algébricas para a Especificação de Sistemas
 **Sistema:** Proposta 1 — Sistema de Biblioteca
 **Ferramenta:** Maude 3.5.1 (execuções reais, macOS arm64)
-**Arquivos:** `src/biblioteca.maude`, `src/demo-biblioteca.maude`, `src/verificar.py`, `src/fuzz.py`, `docs/execucao/*`
+**Arquivos:** `src/biblioteca.maude`, `src/demo-biblioteca.maude`, `src/verificacao.maude`, `docs/execucao/*`
 
 ---
 
@@ -286,7 +286,7 @@ Cada `fmod` usa `protecting` (importa sem alterar a semântica dos sorts importa
 | `==`, `=/=` | Igualdade/desigualdade entre formas normais (decidível: o sistema é terminante e confluente). | testes e guardas |
 | `ceq l = r if c` *(não usado)* | Equação condicional: `l = r` vale quando `c` reduz a `true`. Equivale ao `if`. | — |
 | `[owise]` *(não usado)* | Aplica a equação só se nenhuma outra casar. Não foi necessário, pois todas as equações têm padrões disjuntos. | — |
-| `rl` *(não usado)* | Regra de reescrita não equacional (dinâmica). Toda a especificação é **equacional**. | — |
+| `rl` *(só na verificação)* | Regra de reescrita não equacional. A especificação é **equacional**; `rl` aparece apenas em `verificacao.maude`, para o `search`. | 8.4 |
 
 ### 7.3 Trecho: um modificador completo
 
@@ -306,7 +306,7 @@ eq addLivro(biblioteca(A, Us), L, T) =
 
 ## 8. Parte experimental
 
-Execução: `cd src && maude -no-banner demo-biblioteca.maude`, Maude 3.5.1. O log completo está em `docs/execucao/log-demo.txt`. O verificador `src/verificar.py` compara cada `result` com o `*** esperado:` da demo: **75 testes, 0 divergências**, sem nenhum `Warning`.
+Execução: `cd src && maude -no-banner demo-biblioteca.maude`, Maude 3.5.1. O log completo está em `docs/execucao/log-demo.txt`. Ao final dos testes, o módulo `CONFERENCIA` (também em Maude) repete cada teste `[n]` como uma equação `tN` que compara o resultado com o valor esperado; as seções A a G e `todos?` reduzem a `true`: **75 testes, 0 divergências**, sem nenhum `Warning`.
 
 ### 8.1 Estados usados
 
@@ -387,18 +387,35 @@ Instanciações da propriedade (testes [23]–[26]): `lib0` dá `5 + 1 = 6`; `bi
 
 Outras duas reescritas passo a passo (no log): **[T2]** `contagemOk?` (R7), 14 equações aplicadas até `true`; **[T3]** `emprestar` com livro inexistente, em que a equação `if` escolhe o ramo `else` e devolve `B` (R1).
 
-### 8.4 Verificação adicional por teste aleatório
+### 8.4 Verificação exaustiva com `search`
 
-`src/fuzz.py` (semente fixa 2026) gera 2000 históricos aleatórios com operações válidas e inválidas, sobre 4 usuários e 9 ids de livro (com colisões e ausências propositais), e confere com o Maude real:
+O arquivo `src/verificacao.maude` complementa os 75 termos. Nele, um módulo `DINAMICA` declara 28 regras de reescrita (`rl`), uma para cada operação aplicada a constantes (4 livros, 2 usuários): `rl [emp11] : B => emprestar(B, livro(1), usuario(1)) .` e assim por diante. As regras só servem para o `search` explorar estados; a especificação continua totalmente equacional. A partir de `bibliotecaVazia`, o `search` percorre **todos** os estados alcançáveis. Operações inválidas deixam o estado igual, então não criam estados novos. Resultado (log em `docs/execucao/log-verificacao.txt`):
 
-| Checagem | Resultado |
+| Busca | Resultado |
 |---|---|
-| F1: `invariante?` verdadeiro em todo estado | 2000/2000 |
-| F2: a forma normal contém **só construtores** (suficiente completude empírica) | 2000/2000 |
-| F3: `podeX? == (diagX == ok)` para as 6 operações | 12000/12000 |
-| F4: `podeX? == (opX(B,…) =/= B)`: válida muda o estado, inválida não (**P3**) | 12000/12000 |
+| V1: estado com `invariante?(B) =/= true` (R6, R7, E1, E3) | `No solution`, 6613 estados |
+| V2: estado em que `podeX?`, `diagX == ok` e "o estado muda" discordam, ou P2/R3 falham, para todo par (livro, usuário) | `No solution`, 6613 estados |
+| V3: usuário 1 com 3 livros (limite) | `Solution 1` (estado 1421) |
+| V4: `diagEmprestar` dá `errLimiteExcedido` (E4) | `Solution 1` (estado 2701) |
+| V5: `diagEmprestar` dá `errLivroJaEmprestado` (R2) | `Solution 1` (estado 44) |
+| V6: `diagRemoverUsuario` dá `errUsuarioComLivros` (E2) | `Solution 1` (estado 42) |
+| V7: os 4 livros emprestados | `Solution 1` (estado 5941) |
 
-Cobertura das guardas (casos válidos / inválidos): `addLivro` 559/1441, `removerLivro` 1189/811, `registrarUsuario` 750/1250, `removerUsuario` 804/1196, `emprestar` 715/1285, `devolver` 69/1931. O teste foi **validado por mutação**: removendo a condição de limite (E4) de `podeEmprestar?`, o script acusa 10 falhas.
+V1 e V2 usam `=/= true` e não `== false`, o que também acusaria um termo que não chegasse a construtores. V3 a V7 mostram que os estados interessantes são alcançáveis, ou seja, `No solution` em V1 e V2 não é um resultado vazio por engano. O espaço é finito (6613 estados) porque R6 impede ids repetidos; sem R6, o espaço seria infinito.
+
+A verificação foi **validada por mutação**: em cópias de `biblioteca.maude` com um defeito de cada vez, V1 ou V2 (limitadas a `search [1,10]`) encontram um contraexemplo.
+
+| Defeito injetado | Quem detecta |
+|---|---|
+| sem R6 (aceita id repetido) | V1 (estado 7) e V2 |
+| sem E2 (remove usuário com livros) | V1 (estado 131) e V2 |
+| sem E3 (empresta a usuário não registrado) | V1 (estado 12) e V2 |
+| sem E4 (sem limite de empréstimos) | V2 (estado 2701) |
+| sem R2 (empresta livro já emprestado) | V2 |
+| sem R5 (remove livro emprestado) | V2 |
+| sem R4 (devolve livro de outro usuário) | V2 |
+
+O limite do método: a busca vale só para 4 livros e 2 usuários. Para tamanho arbitrário valem as provas por indução (seção 10).
 
 ---
 
@@ -444,7 +461,7 @@ Como o Lema 5 vale para **todo** acervo, `contagemOk?` vale para todo estado, e 
 **P5.** Se `idsUnicos?(B)` e `podeAddLivro?(B, L)`, então `idsUnicos?(addLivro(B, L, T))`.
 *Lema 6:* `idsUnicosA?(A ; I) = idsUnicosA?(A) ∧ ¬existeA?(A, getId(I))`. Indução em `A`: base `idsUnicosA?(I) = ¬existeA?(nilA, …) ∧ true = true`; passo por `existeA?` sobre `I' ; A'` e a HI. A guarda de R6 fornece o segundo conjunto. ∎
 
-*Observação técnica:* propriedades com variável livre (ex.: `b : Biblioteca`) não reduzem em Maude, porque as guardas dependem da forma de `b`. Por isso as provas são por indução (acima), e **validadas com instâncias concretas** na demo (testes [24]–[31], [65]–[70]) e com o teste aleatório (8.4).
+*Observação técnica:* propriedades com variável livre (ex.: `b : Biblioteca`) não reduzem em Maude, porque as guardas dependem da forma de `b`. Por isso as provas são por indução (acima), e **validadas com instâncias concretas** na demo (testes [24]–[31], [65]–[70]) e com a verificação exaustiva (8.4).
 
 ---
 
@@ -456,7 +473,7 @@ Um sort por papel do domínio: **identificadores distintos** (`IdLivro`, `IdUsua
 
 ### 10.2 (ii) A especificação representa corretamente o sistema?
 
-Sim, no nível de abstração escolhido. Cada funcionalidade F1–F11 tem um operador, e cada regra R1–R7 tem uma guarda ou invariante testado (seção 6 e 8). O comportamento foi checado por 75 termos e por 2000 históricos aleatórios, e as propriedades P1–P5 foram provadas por indução e instanciadas. Duas escolhas merecem registro: o limite E4 é arbitrário (`3`), e `emprestar` ao mesmo usuário que já tem o livro é inválido (R2).
+Sim, no nível de abstração escolhido. Cada funcionalidade F1–F11 tem um operador, e cada regra R1–R7 tem uma guarda ou invariante testado (seção 6 e 8). O comportamento foi checado por 75 termos e por uma busca em todos os 6613 estados alcançáveis com 4 livros e 2 usuários, e as propriedades P1–P5 foram provadas por indução e instanciadas. Duas escolhas merecem registro: o limite E4 é arbitrário (`3`), e `emprestar` ao mesmo usuário que já tem o livro é inválido (R2).
 
 ### 10.3 (iii) O que não foi representado
 
@@ -477,23 +494,23 @@ R1–R7 como guardas e invariantes; E1–E4; P1 (cardinalidade após inserção)
 
 ## 11. Conclusão
 
-A cadeia **informal → abstração → assinatura → equações → termos → propriedades** foi percorrida inteira. A biblioteca é uma álgebra de construtores (`biblioteca`, `item`, `_;_`, `_&_`, `emprestado`, …) com operadores definidos por equações confluentes e terminantes, onde dois monóides representam as coleções e o `Status` embute a relação usuário–livro. A política de **estado inalterado** torna as operações totais e seguras, enquanto os diagnósticos explicam as falhas. As execuções reais (75 termos, 0 divergências, 0 avisos) e os 2000 históricos aleatórios sustentam as provas por indução.
+A cadeia **informal → abstração → assinatura → equações → termos → propriedades** foi percorrida inteira. A biblioteca é uma álgebra de construtores (`biblioteca`, `item`, `_;_`, `_&_`, `emprestado`, …) com operadores definidos por equações confluentes e terminantes, onde dois monóides representam as coleções e o `Status` embute a relação usuário–livro. A política de **estado inalterado** torna as operações totais e seguras, enquanto os diagnósticos explicam as falhas. As execuções reais (75 termos, 0 divergências, 0 avisos) e a busca em 6613 estados sem violação do invariante sustentam as provas por indução.
 
-**Limitações do trabalho:** a suficiente completude foi verificada empiricamente (F2), e não com a ferramenta SCC do Maude; as provas foram feitas em papel.
+**Limitações do trabalho:** a suficiente completude não foi checada com a ferramenta SCC do Maude (só há evidência indireta, em V1); a busca exaustiva cobre apenas 4 livros e 2 usuários; as provas foram feitas em papel.
 
 ### Apêndice — Reprodução e arquivos
 
 ```bash
 cd src
 maude -no-banner demo-biblioteca.maude < /dev/null > ../docs/execucao/log-demo.txt
-python3 verificar.py demo-biblioteca.maude ../docs/execucao/log-demo.txt
-python3 fuzz.py maude 2000        # opcional: teste aleatório
+maude -no-banner verificacao.maude < /dev/null > ../docs/execucao/log-verificacao.txt
 ```
 
 | Arquivo | Conteúdo |
 |---|---|
 | `src/biblioteca.maude` | 5 módulos: `LIVRO-USUARIO`, `ACERVO`, `USUARIOS`, `BIBLIOTECA`, `DIAGNOSTICO` (código completo) |
-| `src/demo-biblioteca.maude` | `DEMO-BIBLIOTECA`, 75 testes numerados + 3 traces |
+| `src/demo-biblioteca.maude` | `DEMO-BIBLIOTECA`, 75 testes numerados, `CONFERENCIA` (auto-conferência) e 3 traces |
+| `src/verificacao.maude` | `COERENCIA` e `DINAMICA` (regras `rl`) com 7 buscas `search` |
 | `docs/execucao/log-demo.txt` | log real completo |
-| `docs/execucao/log-verificacao.txt` | saída do `verificar.py` e do `fuzz.py` |
+| `docs/execucao/log-verificacao.txt` | saída das buscas de `verificacao.maude` |
 | `docs/execucao/assinatura.txt` | `show sorts` e `show ops` do módulo final |
