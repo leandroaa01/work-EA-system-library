@@ -56,7 +56,7 @@ LIVRO-USUARIO ──> ACERVO ────────┐
 
 | Módulo | O que define | Ideia-chave |
 |---|---|---|
-| `LIVRO-USUARIO` | ids, `Status`, `Item` e as projeções `getId`, `getTitulo`, `getStatus` | um item é `item(id, título, status)` |
+| `LIVRO-USUARIO` | ids, `Status`, `Item` e as operações `getId`, `comStatus`, `itemDisponivel?`, `itemDe?` | um item é `item(id, título, status)` |
 | `ACERVO` | lista de itens e operações sobre ela: `totalA`, `existeA?`, `buscarA`, `removerA`, `definirStatus`… | toda operação recursiva tem 2 casos: `nilA` e `I ; A` (cabeça + resto) |
 | `USUARIOS` | lista de usuários: `existeU?`, `removerU`… | idem |
 | `BIBLIOTECA` | estado, consultas, guardas, modificadores e invariantes | cada modificador é `if guarda then novo estado else estado original fi` |

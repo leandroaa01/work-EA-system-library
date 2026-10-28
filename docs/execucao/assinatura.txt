@@ -205,8 +205,6 @@ op disponivel : -> Status [ctor] .
 op emprestado : IdUsuario -> Status [ctor] .
 op item : IdLivro String Status -> Item [ctor] .
 op getId : Item -> IdLivro .
-op getTitulo : Item -> String .
-op getStatus : Item -> Status .
 op comStatus : Item Status -> Item .
 op itemDisponivel? : Item -> Bool .
 op itemDe? : Item IdUsuario -> Bool .

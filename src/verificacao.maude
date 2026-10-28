@@ -1,13 +1,11 @@
-*** Verificação por busca exaustiva (model checking com search).
-*** Parte de bibliotecaVazia e explora TODOS os estados alcançáveis num
-*** universo pequeno (livros 1 a 4, usuários 1 e 2). Em cada estado confere
-*** o invariante e a coerência entre guarda, diagnóstico e mudança de estado.
+*** Verificação exaustiva com search: percorre todos os estados alcançáveis
+*** com livros 1 a 4 e usuários 1 e 2, e confere o invariante e a coerência
+*** entre guarda, diagnóstico e efeito.
 *** Execução: maude -no-banner verificacao.maude < /dev/null
 
 load biblioteca.maude
 
-*** para cada operação: a guarda concorda com o diagnóstico e com o efeito
-*** (guarda verdadeira: o estado muda; guarda falsa: o estado fica igual)
+*** guarda verdadeira <=> diagnóstico ok <=> o estado muda
 fmod COERENCIA is
   protecting DIAGNOSTICO .
 
@@ -59,8 +57,7 @@ fmod COERENCIA is
     addOk?(B, L) and removerLivroOk?(B, L) and registrarOk?(B, U)
     and removerUsuarioOk?(B, U) and emprestarOk?(B, L, U) and devolverOk?(B, L, U) .
 
-  *** confere todos os pares (livro N, usuário M) com N de 1 a 5 e M de 1 a 3
-  *** (livro 5 e usuário 3 nunca existem: cobrem os casos de elemento inexistente)
+  *** todos os pares (livro 1 a 5, usuário 1 a 3); livro 5 e usuário 3 nunca existem
   eq linha?(B, N, 0) = true .
   eq linha?(B, N, s M) = todosOk?(B, livro(N), usuario(s M)) and linha?(B, N, M) .
 
@@ -70,10 +67,8 @@ fmod COERENCIA is
   eq coerente?(B) = varre?(B, 5, 3) .
 endfm
 
-*** Cada regra aplica uma operação a qualquer estado. Operações inválidas
-*** deixam o estado igual (laço), então a busca só avança nas válidas.
-*** Uso de rl: aqui as regras modelam a dinâmica (as operações possíveis);
-*** a especificação em si continua só com equações.
+*** rl só para o search: cada regra aplica uma operação a qualquer estado.
+*** Operações inválidas deixam o estado igual, então a busca só avança nas válidas.
 mod DINAMICA is
   protecting COERENCIA .
 
@@ -114,17 +109,15 @@ mod DINAMICA is
 endm
 
 *** [V1] Em todo estado alcançável o invariante vale (R6, R7, E1, E3).
-*** Usamos =/= true (e não == false) para pegar também termos que não
-*** reduzem a construtores.
+*** Com =/= true, termos que não reduzem a construtores também seriam achados.
 *** esperado: No solution
 search bibliotecaVazia =>* B:Biblioteca such that invariante?(B) =/= true .
 
-*** [V2] Em nenhum estado alcançável guarda, diagnóstico e efeito discordam;
-*** também vale P2 (devolver desfaz emprestar) e R3
+*** [V2] Guarda, diagnóstico e efeito nunca discordam; valem também P2 e R3
 *** esperado: No solution
 search bibliotecaVazia =>* B:Biblioteca such that coerente?(B) =/= true .
 
-*** A busca não é vazia: os estados interessantes são alcançáveis.
+*** V3 a V7: estados interessantes são alcançáveis (V1 e V2 não são vazios por engano)
 *** [V3] Usuário 1 com 3 livros emprestados (o limite)
 *** esperado: Solution 1
 search [1] bibliotecaVazia =>* B:Biblioteca such that qtdDe(B, usuario(1)) == 3 .

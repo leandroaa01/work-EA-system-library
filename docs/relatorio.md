@@ -108,7 +108,7 @@ Subsorts: `Item < Acervo`, `Item < ItemOuErro`, `IdUsuario < Usuarios`. Importad
 | Categoria | Operadores |
 |---|---|
 | **Construtores** `[ctor]` | `livro`, `usuario`, `disponivel`, `emprestado`, `item`, `nilA`, `_;_`, `livroInexistente`, `nilU`, `_&_`, `biblioteca`, `ok`, `err…` (9 constantes de `Diagnostico`) |
-| **Definidos** (sem `[ctor]`) | `getId`, `getTitulo`, `getStatus`, `comStatus`, `itemDisponivel?`, `itemDe?`, `totalA`, `qtdDisponiveisA`, `qtdEmprestadosA`, `existeA?`, `disponivelA?`, `possuiA?`, `buscarA`, `livrosDeA`, `idsUnicosA?`, `removerA`, `definirStatus`, `totalU`, `existeU?`, `removerU`, `unicosU?`, `bibliotecaVazia`, `limiteEmprestimos`, todas as consultas, guardas, modificadores e invariantes de `BIBLIOTECA`, `donosRegA?`, `diag…` |
+| **Definidos** (sem `[ctor]`) | `getId`, `comStatus`, `itemDisponivel?`, `itemDe?`, `totalA`, `qtdDisponiveisA`, `qtdEmprestadosA`, `existeA?`, `disponivelA?`, `possuiA?`, `buscarA`, `livrosDeA`, `idsUnicosA?`, `removerA`, `definirStatus`, `totalU`, `existeU?`, `removerU`, `unicosU?`, `bibliotecaVazia`, `limiteEmprestimos`, todas as consultas, guardas, modificadores e invariantes de `BIBLIOTECA`, `donosRegA?`, `diag…` |
 
 ### 3.3 CONTRATO DA ASSINATURA
 
@@ -120,7 +120,7 @@ Legenda de categoria: **C** construtor, **Q** consulta, **M** modificador, **P**
 | `disponivel` | `-> Status` | C | — | R3 |
 | `emprestado` | `IdUsuario -> Status` | C | — | R2, R4 |
 | `item` | `IdLivro String Status -> Item` | C | — | R6 |
-| `getId`, `getTitulo`, `getStatus` | `Item -> …` | A | 1 cada | — |
+| `getId` | `Item -> IdLivro` | A | 1 | — |
 | `comStatus` | `Item Status -> Item` | A | 1 | R3 |
 | `itemDisponivel?`, `itemDe?` | `Item (IdUsuario) -> Bool` | A | 2 cada | R2, R4 |
 | `nilA`, `_;_` | `-> Acervo`, `Acervo Acervo -> Acervo` | C | axiomas `assoc id:` | monóide |

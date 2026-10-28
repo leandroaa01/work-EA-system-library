@@ -5,7 +5,6 @@
 fmod LIVRO-USUARIO is
   protecting NAT .
   protecting STRING .
-  protecting BOOL .
 
   sorts IdLivro IdUsuario Status Item .
 
@@ -16,8 +15,6 @@ fmod LIVRO-USUARIO is
   op item : IdLivro String Status -> Item [ctor] .
 
   op getId : Item -> IdLivro .
-  op getTitulo : Item -> String .
-  op getStatus : Item -> Status .
   op comStatus : Item Status -> Item .
   op itemDisponivel? : Item -> Bool .
   op itemDe? : Item IdUsuario -> Bool .
@@ -28,8 +25,6 @@ fmod LIVRO-USUARIO is
   vars S S1 : Status .
 
   eq getId(item(L, T, S)) = L .
-  eq getTitulo(item(L, T, S)) = T .
-  eq getStatus(item(L, T, S)) = S .
   eq comStatus(item(L, T, S), S1) = item(L, T, S1) .
 
   eq itemDisponivel?(item(L, T, disponivel)) = true .
@@ -46,7 +41,7 @@ fmod ACERVO is
   subsort Item < Acervo .
   subsort Item < ItemOuErro .
 
-  *** o acervo é uma lista: _;_ associativa com identidade nilA (monóide)
+  *** monóide: _;_ é associativa com identidade nilA
   op nilA : -> Acervo [ctor] .
   op _;_ : Acervo Acervo -> Acervo [ctor assoc id: nilA] .
   op livroInexistente : -> ItemOuErro [ctor] .
@@ -73,7 +68,7 @@ fmod ACERVO is
   eq totalA(nilA) = 0 .
   eq totalA(I ; A) = 1 + totalA(A) .
 
-  *** R7: contagem separada por status
+  *** R7
   eq qtdDisponiveisA(nilA) = 0 .
   eq qtdDisponiveisA(item(L, T, disponivel) ; A) = 1 + qtdDisponiveisA(A) .
   eq qtdDisponiveisA(item(L, T, emprestado(U)) ; A) = qtdDisponiveisA(A) .
@@ -253,7 +248,7 @@ fmod BIBLIOTECA is
     then biblioteca(definirStatus(A, L, emprestado(U)), Us)
     else biblioteca(A, Us) fi .
 
-  *** R3: devolver deixa o livro disponível
+  *** R3
   eq devolver(biblioteca(A, Us), L, U) =
     if podeDevolver?(biblioteca(A, Us), L, U)
     then biblioteca(definirStatus(A, L, disponivel), Us)

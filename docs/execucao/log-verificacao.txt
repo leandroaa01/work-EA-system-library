@@ -3,21 +3,21 @@ search in DINAMICA : bibliotecaVazia =>* B such that invariante?(B) =/= true =
     true .
 
 No solution.
-states: 6613  rewrites: 9161861 in 405ms cpu (408ms real) (22609876
+states: 6613  rewrites: 9161861 in 394ms cpu (397ms real) (23199870
     rewrites/second)
 ==========================================
 search in DINAMICA : bibliotecaVazia =>* B such that coerente?(B) =/= true =
     true .
 
 No solution.
-states: 6613  rewrites: 81205087 in 2458ms cpu (2462ms real) (33024347
+states: 6613  rewrites: 81205087 in 2632ms cpu (2687ms real) (30847335
     rewrites/second)
 ==========================================
 search [1] in DINAMICA : bibliotecaVazia =>* B such that qtdDe(B, usuario(1))
     == 3 = true .
 
 Solution 1 (state 1421)
-states: 1422  rewrites: 632229 in 24ms cpu (24ms real) (25626403
+states: 1422  rewrites: 632229 in 24ms cpu (25ms real) (25822128
     rewrites/second)
 B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
     "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
@@ -27,7 +27,7 @@ search [1] in DINAMICA : bibliotecaVazia =>* B such that diagEmprestar(B,
     livro(4), usuario(1)) == errLimiteExcedido = true .
 
 Solution 1 (state 2701)
-states: 2702  rewrites: 1615993 in 60ms cpu (62ms real) (26884376
+states: 2702  rewrites: 1615993 in 60ms cpu (62ms real) (26746437
     rewrites/second)
 B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
     "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
@@ -37,7 +37,7 @@ search [1] in DINAMICA : bibliotecaVazia =>* B such that diagEmprestar(B,
     livro(1), usuario(2)) == errLivroJaEmprestado = true .
 
 Solution 1 (state 44)
-states: 45  rewrites: 7110 in 0ms cpu (0ms real) (34019138 rewrites/second)
+states: 45  rewrites: 7110 in 0ms cpu (0ms real) (~ rewrites/second)
 B --> biblioteca(item(livro(1), "t1", emprestado(usuario(2))), usuario(2))
 ==========================================
 search [1] in DINAMICA : bibliotecaVazia =>* B such that diagRemoverUsuario(B,
@@ -51,7 +51,7 @@ search [1] in DINAMICA : bibliotecaVazia =>* B such that qtdEmprestados(B) == 4
     = true .
 
 Solution 1 (state 5941)
-states: 5942  rewrites: 5319166 in 215ms cpu (215ms real) (24721105
+states: 5942  rewrites: 5319166 in 219ms cpu (220ms real) (24271029
     rewrites/second)
 B --> biblioteca(item(livro(1), "t1", emprestado(usuario(1))) ; item(livro(2),
     "t2", emprestado(usuario(1))) ; item(livro(3), "t3", emprestado(usuario(
